@@ -1,20 +1,35 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import NavBar from '@/components/navigation/nav-bar';
-import { tasks as allTasks } from '@/data/mockData';
+import { tasks as initialTasks, categories } from '@/data/mockData';
 import { Task } from '@/types';
 import GlassCard from '@/components/ui/glass-card';
 import { Button } from '@/components/ui/button';
-import { Check, Clock, Filter, Plus, Search, X } from 'lucide-react';
+import { Check, Clock as ClockIcon, Filter, Plus, Search, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import FloatingActionButton from '@/components/ui/floating-action-button';
+import { getTasks, setTasks, updateTask, addExperience } from '@/services/storageService';
+import { v4 as uuidv4 } from 'uuid';
 
 const Tasks = () => {
   const [filter, setFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [tasks, setTasksState] = useState<Task[]>([]);
   
-  const filteredTasks = allTasks.filter(task => {
+  // Load tasks from localStorage on component mount
+  useEffect(() => {
+    const storedTasks = getTasks();
+    if (storedTasks.length > 0) {
+      setTasksState(storedTasks);
+    } else {
+      // Initialize with default tasks if none exist
+      setTasks(initialTasks);
+      setTasksState(initialTasks);
+    }
+  }, []);
+  
+  const filteredTasks = tasks.filter(task => {
     // Filter by status
     if (filter === 'completed' && !task.completed) return false;
     if (filter === 'pending' && task.completed) return false;
@@ -28,8 +43,51 @@ const Tasks = () => {
   });
   
   const toggleTaskCompletion = (taskId: string) => {
-    toast.success("Task status updated", {
-      description: "Your XP has been updated accordingly.",
+    const taskToUpdate = tasks.find(t => t.id === taskId);
+    if (!taskToUpdate) return;
+    
+    const updatedTask = { ...taskToUpdate, completed: !taskToUpdate.completed };
+    
+    // Update task in local state
+    const updatedTasks = tasks.map(t => t.id === taskId ? updatedTask : t);
+    setTasksState(updatedTasks);
+    
+    // Update task in localStorage
+    updateTask(taskId, { completed: updatedTask.completed });
+    
+    // Award XP if task is being completed
+    if (updatedTask.completed) {
+      addExperience(updatedTask.xpReward);
+      toast.success("Task completed!", {
+        description: `You earned +${updatedTask.xpReward} XP.`,
+      });
+    } else {
+      toast.info("Task marked as incomplete", {
+        description: "Task status updated.",
+      });
+    }
+  };
+
+  // Function to add a new task
+  const addNewTask = () => {
+    // This would normally open a form, but for now just create a dummy task
+    const newTask: Task = {
+      id: uuidv4(),
+      title: "New Task",
+      description: "Click to edit this task",
+      completed: false,
+      date: new Date().toISOString(),
+      recurring: false,
+      xpReward: 10,
+      createdAt: new Date().toISOString()
+    };
+    
+    const updatedTasks = [...tasks, newTask];
+    setTasksState(updatedTasks);
+    setTasks(updatedTasks);
+    
+    toast.success("New task created", {
+      description: "Edit the task to customize it.",
     });
   };
 
@@ -57,7 +115,7 @@ const Tasks = () => {
               size="sm" 
               className="border-solo-accent/30 hover:bg-solo-accent/10 text-solo-accent"
             >
-              <Clock className="h-4 w-4 mr-1" />
+              <ClockIcon className="h-4 w-4 mr-1" />
               <span className="hidden sm:inline">History</span>
             </Button>
           </div>
@@ -146,7 +204,7 @@ const Tasks = () => {
         
         {/* Add Task Button */}
         <FloatingActionButton 
-          onClick={() => toast("Task creation not implemented yet")} 
+          onClick={addNewTask} 
           className="bg-gradient-to-r from-solo-accent to-solo-highlight hover:from-solo-highlight hover:to-solo-accent text-white"
         />
       </div>

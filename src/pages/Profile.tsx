@@ -1,270 +1,118 @@
-
 import React from 'react';
 import NavBar from '@/components/navigation/nav-bar';
-import { user, skills } from '@/data/mockData';
+import { user, skills, achievements } from '@/data/mockData';
 import GlassCard from '@/components/ui/glass-card';
-import ProgressRing from '@/components/ui/progress-ring';
-import { 
-  User as UserIcon, 
-  Settings, 
-  Crown, 
-  Award, 
-  Trophy, 
-  Target, 
-  ChartBar, 
-  Heart,
-  Brain,
-  Activity,
-  BookOpen
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
+import { Progress } from '@/components/ui/progress';
+import { Badge } from '@/components/ui/badge';
+import { Award, Book, Brain, Dumbbell, Flame, Star, Clock as ClockIcon, Shield, Trophy } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
 
 const Profile = () => {
-  const experiencePercentage = (user.experience / user.nextLevelExperience) * 100;
-  
   return (
     <div className="min-h-screen pb-20 pt-20">
       <div className="container mx-auto px-4 max-w-lg">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6 animate-fade-in">
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-solo-accent to-solo-highlight bg-clip-text text-transparent">
-            Your Profile
-          </h1>
-          <Button 
-            variant="ghost" 
-            size="icon"
-            className="rounded-full bg-black/20 hover:bg-black/30"
-            onClick={() => toast("Settings would open here")}
-          >
-            <Settings className="h-5 w-5" />
-          </Button>
-        </div>
-        
-        {/* Hero Card */}
-        <GlassCard className="mb-6 animate-scale-in">
-          <div className="flex items-center mb-6">
-            <div className="h-20 w-20 rounded-full bg-gradient-to-br from-solo-accent to-solo-highlight flex items-center justify-center mr-4">
-              <UserIcon className="h-10 w-10 text-white" />
+        {/* Profile Header */}
+        <GlassCard className="mb-6 animate-fade-in">
+          <div className="flex items-center space-x-4">
+            <div className="w-20 h-20 rounded-full bg-gray-700">
+              {/* Placeholder for user avatar */}
             </div>
-            
-            <div className="flex-1">
-              <h2 className="text-xl font-bold">{user.name}</h2>
-              <div className="flex items-center">
-                <span className="text-solo-secondary">{user.rank}</span>
-                <span className="ml-2 px-2 py-0.5 rounded-full bg-solo-accent/20 text-solo-accent text-xs">
-                  Level {user.level}
-                </span>
-              </div>
-              <div className="flex items-center mt-1">
-                <Crown className="h-4 w-4 text-yellow-500 mr-1" />
-                <span className="text-sm">{user.currency} coins</span>
-              </div>
+            <div>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-solo-accent to-solo-highlight bg-clip-text text-transparent">
+                {user.name}
+              </h1>
+              <p className="text-solo-secondary">{user.rank}</p>
             </div>
           </div>
-          
-          <div className="flex items-center justify-center mb-4">
-            <ProgressRing 
-              progress={experiencePercentage} 
-              size={150}
-              strokeWidth={12}
-              background="rgba(0,0,0,0.3)"
-              foreground="rgb(139, 92, 246)"
-            >
-              <div className="flex flex-col items-center justify-center">
-                <span className="text-solo-secondary text-sm">LEVEL</span>
-                <span className="text-4xl font-bold">{user.level}</span>
-                <span className="text-xs text-solo-secondary">{user.experience}/{user.nextLevelExperience} XP</span>
-              </div>
-            </ProgressRing>
+          <Separator className="my-4 bg-white/10" />
+          <div>
+            <div className="flex items-center justify-between">
+              <div className="text-solo-secondary">Level {user.level}</div>
+              <div className="text-solo-secondary">{user.experience}/{user.nextLevelExperience} XP</div>
+            </div>
+            <Progress value={(user.experience / user.nextLevelExperience) * 100} className="h-2 mt-2 bg-black/20" />
           </div>
-          
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-black/20 rounded-lg p-3 flex items-center">
-              <div className="h-10 w-10 rounded-full bg-solo-accent/20 flex items-center justify-center mr-3">
-                <Trophy className="h-5 w-5 text-solo-accent" />
-              </div>
-              <div>
-                <div className="text-sm text-solo-secondary">Achievements</div>
-                <div className="font-bold">14/50</div>
-              </div>
+        </GlassCard>
+
+        {/* Stats */}
+        <GlassCard className="mb-6 animate-fade-in">
+          <h2 className="text-lg font-semibold mb-4 bg-gradient-to-r from-solo-accent to-solo-highlight bg-clip-text text-transparent">
+            Stats
+          </h2>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex items-center">
+              <Dumbbell className="h-5 w-5 mr-2 text-solo-accent" />
+              Strength: {user.stats.strength}
             </div>
-            
-            <div className="bg-black/20 rounded-lg p-3 flex items-center">
-              <div className="h-10 w-10 rounded-full bg-solo-accent/20 flex items-center justify-center mr-3">
-                <Target className="h-5 w-5 text-solo-accent" />
-              </div>
-              <div>
-                <div className="text-sm text-solo-secondary">Quests</div>
-                <div className="font-bold">98 completed</div>
-              </div>
+            <div className="flex items-center">
+              <Brain className="h-5 w-5 mr-2 text-solo-accent" />
+              Intelligence: {user.stats.intelligence}
             </div>
-            
-            <div className="bg-black/20 rounded-lg p-3 flex items-center">
-              <div className="h-10 w-10 rounded-full bg-solo-accent/20 flex items-center justify-center mr-3">
-                <Award className="h-5 w-5 text-solo-accent" />
-              </div>
-              <div>
-                <div className="text-sm text-solo-secondary">Streak</div>
-                <div className="font-bold">7 days</div>
-              </div>
+            <div className="flex items-center">
+              <Flame className="h-5 w-5 mr-2 text-solo-accent" />
+              Charisma: {user.stats.charisma}
             </div>
-            
-            <div className="bg-black/20 rounded-lg p-3 flex items-center">
-              <div className="h-10 w-10 rounded-full bg-solo-accent/20 flex items-center justify-center mr-3">
-                <ChartBar className="h-5 w-5 text-solo-accent" />
-              </div>
-              <div>
-                <div className="text-sm text-solo-secondary">Total XP</div>
-                <div className="font-bold">1,345</div>
-              </div>
+            <div className="flex items-center">
+              <Shield className="h-5 w-5 mr-2 text-solo-accent" />
+              Endurance: {user.stats.endurance}
+            </div>
+            <div className="flex items-center">
+              <ClockIcon className="h-5 w-5 mr-2 text-solo-accent" />
+              Focus: {user.stats.focus}
             </div>
           </div>
         </GlassCard>
-        
-        {/* Stats Section */}
-        <h3 className="text-lg font-medium mb-3 animate-fade-in">Stats</h3>
-        <GlassCard className="mb-6 animate-scale-in">
-          <div className="grid grid-cols-2 gap-4">
-            {Object.entries(user.stats).map(([stat, value]) => (
-              <StatItem 
-                key={stat} 
-                name={stat} 
-                value={value} 
-                maxValue={10}
-              />
+
+        {/* Skills */}
+        <GlassCard className="mb-6 animate-fade-in">
+          <h2 className="text-lg font-semibold mb-4 bg-gradient-to-r from-solo-accent to-solo-highlight bg-clip-text text-transparent">
+            Skills
+          </h2>
+          <div className="space-y-3">
+            {skills.map((skill) => (
+              <div key={skill.id} className="flex items-center justify-between">
+                <div className="flex items-center">
+                  {skill.icon === 'activity' && <Dumbbell className="h-5 w-5 mr-2 text-solo-accent" />}
+                  {skill.icon === 'book-open' && <Book className="h-5 w-5 mr-2 text-solo-accent" />}
+                  {skill.icon === 'brain' && <Brain className="h-5 w-5 mr-2 text-solo-accent" />}
+                  {skill.icon === 'languages' && <Award className="h-5 w-5 mr-2 text-solo-accent" />}
+                  {skill.icon === 'clock' && <ClockIcon className="h-5 w-5 mr-2 text-solo-accent" />}
+                  {skill.name}
+                </div>
+                <Badge variant="secondary">Level {skill.level}</Badge>
+              </div>
             ))}
           </div>
         </GlassCard>
-        
-        {/* Skills Section */}
-        <h3 className="text-lg font-medium mb-3 animate-fade-in">Skills</h3>
-        <div className="space-y-4 mb-6 animate-scale-in">
-          {skills.map((skill) => (
-            <SkillItem key={skill.id} skill={skill} />
-          ))}
-        </div>
+
+        {/* Achievements */}
+        <GlassCard className="mb-6 animate-fade-in">
+          <h2 className="text-lg font-semibold mb-4 bg-gradient-to-r from-solo-accent to-solo-highlight bg-clip-text text-transparent">
+            Achievements
+          </h2>
+          <div className="space-y-3">
+            {achievements.map((achievement) => (
+              <div key={achievement.id} className="flex items-center justify-between">
+                <div className="flex items-center">
+                  {achievement.icon === 'footprints' && <Flame className="h-5 w-5 mr-2 text-solo-accent" />}
+                  {achievement.icon === 'sun' && <Star className="h-5 w-5 mr-2 text-solo-accent" />}
+                  {achievement.icon === 'flame' && <Flame className="h-5 w-5 mr-2 text-solo-accent" />}
+                  {achievement.icon === 'book' && <Book className="h-5 w-5 mr-2 text-solo-accent" />}
+                  {achievement.icon === 'dumbbell' && <Dumbbell className="h-5 w-5 mr-2 text-solo-accent" />}
+                  {achievement.name}
+                </div>
+                {achievement.completed ? (
+                  <Trophy className="h-5 w-5 text-solo-highlight" />
+                ) : (
+                  <div className="w-5 h-5" />
+                )}
+              </div>
+            ))}
+          </div>
+        </GlassCard>
       </div>
-      
       <NavBar />
     </div>
-  );
-};
-
-interface StatItemProps {
-  name: string;
-  value: number;
-  maxValue: number;
-}
-
-const StatItem = ({ name, value, maxValue }: StatItemProps) => {
-  const percentage = (value / maxValue) * 100;
-  
-  // Get the appropriate icon based on stat name
-  const getIcon = () => {
-    switch (name.toLowerCase()) {
-      case 'strength':
-        return <Activity className="h-5 w-5 text-solo-accent" />;
-      case 'intelligence':
-        return <Brain className="h-5 w-5 text-solo-accent" />;
-      case 'charisma':
-        return <Heart className="h-5 w-5 text-solo-accent" />;
-      case 'endurance':
-        return <Target className="h-5 w-5 text-solo-accent" />;
-      case 'focus':
-        return <BookOpen className="h-5 w-5 text-solo-accent" />;
-      default:
-        return <Award className="h-5 w-5 text-solo-accent" />;
-    }
-  };
-  
-  return (
-    <div className="flex flex-col">
-      <div className="flex items-center mb-2">
-        <div className="h-8 w-8 rounded-full bg-solo-accent/20 flex items-center justify-center mr-2">
-          {getIcon()}
-        </div>
-        <div className="flex-1">
-          <div className="text-sm capitalize">{name}</div>
-          <div className="text-xs text-solo-secondary">{value}/{maxValue}</div>
-        </div>
-      </div>
-      
-      <div className="w-full bg-black/30 rounded-full h-2 overflow-hidden">
-        <div 
-          className="bg-gradient-to-r from-solo-accent to-solo-highlight h-full rounded-full transition-all duration-1000"
-          style={{ width: `${percentage}%` }}
-        ></div>
-      </div>
-    </div>
-  );
-};
-
-interface SkillItemProps {
-  skill: {
-    id: string;
-    name: string;
-    level: number;
-    experience: number;
-    nextLevelExp: number;
-    icon?: string;
-  };
-}
-
-const SkillItem = ({ skill }: SkillItemProps) => {
-  const percentage = (skill.experience / skill.nextLevelExp) * 100;
-  
-  // Get the appropriate icon based on skill name
-  const getIcon = () => {
-    switch (skill.icon) {
-      case 'activity':
-        return <Activity className="h-6 w-6" />;
-      case 'book-open':
-        return <BookOpen className="h-6 w-6" />;
-      case 'brain':
-        return <Brain className="h-6 w-6" />;
-      case 'clock':
-        return <Clock className="h-6 w-6" />;
-      default:
-        return <Award className="h-6 w-6" />;
-    }
-  };
-  
-  return (
-    <GlassCard>
-      <div className="flex items-center">
-        <div className="h-14 w-14 rounded-lg bg-gradient-to-br from-solo-accent/20 to-solo-highlight/20 flex items-center justify-center mr-4">
-          {getIcon()}
-        </div>
-        
-        <div className="flex-1">
-          <div className="flex justify-between items-center mb-1">
-            <span className="font-medium">{skill.name}</span>
-            <span className="text-sm bg-solo-highlight/20 text-solo-highlight py-0.5 px-2 rounded-full">
-              Lv. {skill.level}
-            </span>
-          </div>
-          
-          <div className="flex justify-between text-xs text-solo-secondary mb-1">
-            <span>Experience</span>
-            <span>{skill.experience}/{skill.nextLevelExp}</span>
-          </div>
-          
-          <div className="w-full bg-black/30 rounded-full h-2 overflow-hidden">
-            <div 
-              className={cn(
-                "h-full rounded-full transition-all duration-1000",
-                percentage < 30 ? "bg-red-500" : 
-                percentage < 70 ? "bg-yellow-500" : 
-                "bg-gradient-to-r from-solo-accent to-solo-highlight"
-              )}
-              style={{ width: `${percentage}%` }}
-            ></div>
-          </div>
-        </div>
-      </div>
-    </GlassCard>
   );
 };
 

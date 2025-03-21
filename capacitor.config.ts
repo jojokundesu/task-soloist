@@ -2,13 +2,10 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.lovable.6c03966d9bf04a1b8b1402bebcb6368a',
+  appId: 'app.lovable.tasksoloist',
   appName: 'Task Soloist',
   webDir: 'dist',
-  server: {
-    url: "https://6c03966d-9bf0-4a1b-8b14-02bebcb6368a.lovableproject.com?forceHideBadge=true",
-    cleartext: true
-  },
+  bundledWebRuntime: true, // Package the web app with the native app
   plugins: {
     SplashScreen: {
       launchShowDuration: 2000,
@@ -19,6 +16,20 @@ const config: CapacitorConfig = {
       splashFullScreen: true,
       splashImmersive: true
     }
+  },
+  // This is required for Capacitor to work without a network connection
+  loggingBehavior: 'none',
+  android: {
+    buildOptions: {
+      keystorePath: undefined,
+      keystorePassword: undefined,
+      keystoreAlias: undefined,
+      keystoreAliasPassword: undefined,
+      releaseType: 'none'
+    }
+  },
+  ios: {
+    contentInset: 'always'
   }
 };
 
