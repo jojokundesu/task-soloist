@@ -11,23 +11,47 @@ import Achievements from "./pages/Achievements";
 import Calendar from "./pages/Calendar";
 import Profile from "./pages/Profile";
 import Stats from "./pages/Stats";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { initializeApp } from "./services/initService";
 
+// Configure the QueryClient for offline-first behavior
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
       staleTime: Infinity, // Don't refetch data automatically
+      retry: false, // Don't retry failed requests (better for offline)
+      networkMode: 'always', // Works with or without network
     },
   },
 });
 
 const App = () => {
+  const [isInitialized, setIsInitialized] = useState(false);
+
   // Initialize the app with default data from localStorage on startup
   useEffect(() => {
+    // Initialize the app data
     initializeApp();
+    setIsInitialized(true);
+    
+    // Listen for app going online/offline and handle accordingly
+    const handleOnline = () => console.log("App is online");
+    const handleOffline = () => console.log("App is offline - using local data");
+    
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
   }, []);
+
+  // Show nothing until initialization is complete
+  if (!isInitialized) {
+    return null;
+  }
 
   return (
     <QueryClientProvider client={queryClient}>

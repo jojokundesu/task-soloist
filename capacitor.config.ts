@@ -15,7 +15,17 @@ const config: CapacitorConfig = {
       spinnerColor: "#8B5CF6",
       splashFullScreen: true,
       splashImmersive: true
+    },
+    // Explicitly declare which permissions we need (minimal)
+    Permissions: {
+      permissions: [] // No specific permissions needed for this app
     }
+  },
+  server: {
+    // Remove the server block for production builds
+    // This ensures the app works completely offline
+    hostname: "localhost",
+    androidScheme: "https"
   },
   // This is required for Capacitor to work without a network connection
   loggingBehavior: 'none',
