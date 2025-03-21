@@ -5,6 +5,7 @@ import ProgressRing from '../ui/progress-ring';
 import { ArrowUpRight, Gauge, Swords } from 'lucide-react';
 import { User } from '@/types';
 import { cn } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
 
 interface HeroCardProps {
   user: User;
@@ -13,6 +14,11 @@ interface HeroCardProps {
 
 const HeroCard = ({ user, className }: HeroCardProps) => {
   const experiencePercentage = (user.experience / user.nextLevelExperience) * 100;
+  const navigate = useNavigate();
+
+  const handleDetailsClick = () => {
+    navigate('/stats');
+  };
 
   return (
     <GlassCard className={cn("p-5", className)}>
@@ -73,7 +79,10 @@ const HeroCard = ({ user, className }: HeroCardProps) => {
               <span className="text-2xl font-bold">{user.level}</span>
             </div>
           </ProgressRing>
-          <button className="mt-2 text-xs flex items-center text-solo-accent">
+          <button 
+            className="mt-2 text-xs flex items-center text-solo-accent hover:text-solo-highlight transition-colors"
+            onClick={handleDetailsClick}
+          >
             <span>Details</span>
             <ArrowUpRight className="h-3 w-3 ml-1" />
           </button>

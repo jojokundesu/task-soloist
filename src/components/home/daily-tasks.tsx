@@ -1,21 +1,116 @@
 
 import React from 'react';
 import GlassCard from '../ui/glass-card';
-import { ListTodo, Plus } from 'lucide-react';
+import { ListTodo, Plus, Trash2 } from 'lucide-react';
 import { Task } from '@/types';
 import { Button } from '../ui/button';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { updateTask, getTasks, setTasks, addExperience } from '@/services/storageService';
+import { v4 as uuidv4 } from 'uuid';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { useState } from 'react';
 
 interface DailyTasksProps {
   tasks: Task[];
   className?: string;
 }
 
-const DailyTasks = ({ tasks, className }: DailyTasksProps) => {
+const DailyTasks = ({ tasks: initialTasks, className }: DailyTasksProps) => {
+  const [tasks, setTasksState] = React.useState<Task[]>(initialTasks);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
+  
+  // Load tasks from storage on mount to ensure we have the latest data
+  React.useEffect(() => {
+    const storedTasks = getTasks();
+    if (storedTasks.length > 0) {
+      setTasksState(storedTasks);
+    }
+  }, []);
+
   const toggleTaskCompletion = (taskId: string) => {
-    toast.success("Task status updated", {
-      description: "Your XP has been updated accordingly.",
+    const taskToUpdate = tasks.find(t => t.id === taskId);
+    if (!taskToUpdate) return;
+    
+    const updatedTask = { ...taskToUpdate, completed: !taskToUpdate.completed };
+    
+    // Update task in local state
+    const updatedTasks = tasks.map(t => t.id === taskId ? updatedTask : t);
+    setTasksState(updatedTasks);
+    
+    // Update task in localStorage
+    updateTask(taskId, { completed: updatedTask.completed });
+    
+    // Award XP if task is being completed
+    if (updatedTask.completed) {
+      addExperience(updatedTask.xpReward);
+      toast.success("Task completed!", {
+        description: `You earned +${updatedTask.xpReward} XP.`,
+      });
+    } else {
+      toast.info("Task marked as incomplete", {
+        description: "Task status updated.",
+      });
+    }
+  };
+
+  const openDeleteDialog = (taskId: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent task toggling when clicking delete button
+    setTaskToDelete(taskId);
+    setIsDeleteDialogOpen(true);
+  };
+  
+  const confirmDeleteTask = () => {
+    if (!taskToDelete) return;
+    
+    // Update local state
+    const updatedTasks = tasks.filter(t => t.id !== taskToDelete);
+    setTasksState(updatedTasks);
+    
+    // Update localStorage
+    const allTasks = getTasks();
+    const filteredTasks = allTasks.filter(t => t.id !== taskToDelete);
+    setTasks(filteredTasks);
+    
+    setIsDeleteDialogOpen(false);
+    setTaskToDelete(null);
+    
+    toast.success("Task deleted", {
+      description: "The task has been removed from your quests.",
+    });
+  };
+
+  const addNewTask = () => {
+    // Create a new simple task
+    const newTask: Task = {
+      id: uuidv4(),
+      title: "New Quest",
+      description: "Click to edit this quest",
+      completed: false,
+      date: new Date().toISOString(),
+      recurring: false,
+      xpReward: 10,
+      createdAt: new Date().toISOString()
+    };
+    
+    // Update local state
+    const updatedTasks = [...tasks, newTask];
+    setTasksState(updatedTasks);
+    
+    // Update localStorage
+    const allTasks = getTasks();
+    setTasks([...allTasks, newTask]);
+    
+    toast.success("New quest created", {
+      description: "Edit the quest to customize it.",
     });
   };
 
@@ -82,18 +177,55 @@ const DailyTasks = ({ tasks, className }: DailyTasksProps) => {
             )}>
               +{task.xpReward} XP
             </div>
+            
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity ml-2 text-solo-secondary hover:text-red-500 hover:bg-red-500/10"
+              onClick={(e) => openDeleteDialog(task.id, e)}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
           </div>
         ))}
         
         <Button 
           variant="ghost" 
           className="w-full mt-2 border border-dashed border-white/10 hover:border-solo-accent/30 hover:bg-black/10"
-          onClick={() => toast("Task creation not implemented yet")}
+          onClick={addNewTask}
         >
           <Plus className="h-4 w-4 mr-2" />
           Add New Quest
         </Button>
       </div>
+      
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="bg-background/95 backdrop-blur-sm border-white/10">
+          <DialogHeader>
+            <DialogTitle className="text-solo-text">Delete Quest</DialogTitle>
+            <DialogDescription className="text-solo-secondary">
+              Are you sure you want to delete this quest? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteDialogOpen(false)}
+              className="border-white/10 text-solo-text"
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmDeleteTask}
+              className="bg-red-500 hover:bg-red-600 text-white"
+            >
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </GlassCard>
   );
 };

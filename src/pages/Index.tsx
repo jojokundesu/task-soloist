@@ -1,13 +1,31 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import NavBar from '@/components/navigation/nav-bar';
-import { user, tasks, skills, achievements } from '@/data/mockData';
+import { user as defaultUser, tasks as defaultTasks, skills, achievements } from '@/data/mockData';
 import HeroCard from '@/components/home/hero-card';
 import DailyTasks from '@/components/home/daily-tasks';
 import SkillsSection from '@/components/home/skills-section';
 import AchievementsSection from '@/components/home/achievements-section';
+import { getTasks, getUser } from '@/services/storageService';
+import { Task, User } from '@/types';
 
 const Index = () => {
+  const [tasks, setTasks] = useState<Task[]>(defaultTasks);
+  const [user, setUser] = useState<User>(defaultUser);
+
+  // Load data from localStorage on component mount
+  useEffect(() => {
+    const storedTasks = getTasks();
+    if (storedTasks.length > 0) {
+      setTasks(storedTasks);
+    }
+    
+    const storedUser = getUser();
+    if (storedUser) {
+      setUser(storedUser);
+    }
+  }, []);
+
   return (
     <div className="min-h-screen pb-20 pt-20">
       <div className="container mx-auto px-4 max-w-lg">
