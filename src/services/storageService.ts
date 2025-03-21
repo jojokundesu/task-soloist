@@ -10,6 +10,7 @@ const STORAGE_KEYS = {
   CATEGORIES: 'tasks_soloist_categories',
   REWARDS: 'tasks_soloist_rewards',
   DAILY_TASKS: 'tasks_soloist_daily_tasks',
+  INITIALIZED: 'app_initialized',
 };
 
 // Generic get function
@@ -30,6 +31,11 @@ const setItem = <T>(key: string, value: T): void => {
   } catch (error) {
     console.error(`Error saving ${key} to storage:`, error);
   }
+};
+
+// Check if the app data is initialized
+export const checkStorageInitialized = (): boolean => {
+  return localStorage.getItem(STORAGE_KEYS.INITIALIZED) === 'true';
 };
 
 // Tasks
@@ -140,4 +146,41 @@ export const initializeStorage = (
   if (getCategories().length === 0) setCategories(defaultCategories);
   if (getTasks().length === 0) setTasks(defaultTasks);
   if (getRewards().length === 0) setRewards(defaultRewards);
+  
+  // Set initialized flag
+  localStorage.setItem(STORAGE_KEYS.INITIALIZED, 'true');
+};
+
+// Backup and restore user data functions
+export const exportUserData = (): string => {
+  const userData = {
+    user: getUser(),
+    tasks: getTasks(),
+    skills: getSkills(),
+    achievements: getAchievements(),
+    categories: getCategories(),
+    rewards: getRewards(),
+    dailyTasks: getDailyTasks()
+  };
+  
+  return JSON.stringify(userData);
+};
+
+export const importUserData = (jsonData: string): boolean => {
+  try {
+    const userData = JSON.parse(jsonData);
+    
+    if (userData.user) setUser(userData.user);
+    if (userData.tasks) setTasks(userData.tasks);
+    if (userData.skills) setSkills(userData.skills);
+    if (userData.achievements) setAchievements(userData.achievements);
+    if (userData.categories) setCategories(userData.categories);
+    if (userData.rewards) setRewards(userData.rewards);
+    if (userData.dailyTasks) setDailyTasks(userData.dailyTasks);
+    
+    return true;
+  } catch (error) {
+    console.error("Failed to import user data:", error);
+    return false;
+  }
 };

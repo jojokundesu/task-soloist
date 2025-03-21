@@ -1,13 +1,24 @@
+
 import React from 'react';
 import NavBar from '@/components/navigation/nav-bar';
-import { user, skills, achievements } from '@/data/mockData';
+import { getUser, getSkills, getAchievements } from '@/services/storageService';
 import GlassCard from '@/components/ui/glass-card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Award, Book, Brain, Dumbbell, Flame, Star, Clock as ClockIcon, Shield, Trophy } from 'lucide-react';
+import { Award, Book, Brain, Dumbbell, Flame, Star, Clock, Shield, Trophy } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import GoogleAccountLink from '@/components/settings/GoogleAccountLink';
 
 const Profile = () => {
+  // Get data from storage instead of mock data
+  const user = getUser();
+  const skills = getSkills();
+  const achievements = getAchievements();
+
+  if (!user) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="min-h-screen pb-20 pt-20">
       <div className="container mx-auto px-4 max-w-lg">
@@ -57,11 +68,16 @@ const Profile = () => {
               Endurance: {user.stats.endurance}
             </div>
             <div className="flex items-center">
-              <ClockIcon className="h-5 w-5 mr-2 text-solo-accent" />
+              <Clock className="h-5 w-5 mr-2 text-solo-accent" />
               Focus: {user.stats.focus}
             </div>
           </div>
         </GlassCard>
+
+        {/* Google Account Link */}
+        <div className="mb-6">
+          <GoogleAccountLink />
+        </div>
 
         {/* Skills */}
         <GlassCard className="mb-6 animate-fade-in">
@@ -76,7 +92,7 @@ const Profile = () => {
                   {skill.icon === 'book-open' && <Book className="h-5 w-5 mr-2 text-solo-accent" />}
                   {skill.icon === 'brain' && <Brain className="h-5 w-5 mr-2 text-solo-accent" />}
                   {skill.icon === 'languages' && <Award className="h-5 w-5 mr-2 text-solo-accent" />}
-                  {skill.icon === 'clock' && <ClockIcon className="h-5 w-5 mr-2 text-solo-accent" />}
+                  {skill.icon === 'clock' && <Clock className="h-5 w-5 mr-2 text-solo-accent" />}
                   {skill.name}
                 </div>
                 <Badge variant="secondary">Level {skill.level}</Badge>
