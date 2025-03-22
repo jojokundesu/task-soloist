@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import NavBar from '@/components/navigation/nav-bar';
-import { ArrowLeft, Info, Play, X, Clock, Brain, Check } from 'lucide-react';
+import { ArrowLeft, Info, Play, X, Clock, Brain, Check, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -9,7 +9,7 @@ import { getPublicMeditations, getSecretMeditation } from '@/data/meditationData
 import { innerEngineeringLink } from '@/data/meditationData';
 import GlassCard from '@/components/ui/glass-card';
 import { Meditation as MeditationType } from '@/types';
-import { updateMeditationStreak, checkSecretMeditationUnlocked } from '@/services/storageService';
+import { updateMeditationStreak, checkSecretMeditationUnlocked, getMeditationStreak } from '@/services/storageService';
 import { 
   Drawer,
   DrawerContent,
