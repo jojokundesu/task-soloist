@@ -11,6 +11,7 @@ import Achievements from "./pages/Achievements";
 import Calendar from "./pages/Calendar";
 import Profile from "./pages/Profile";
 import Stats from "./pages/Stats";
+import Meditation from "./pages/Meditation";
 import { useEffect, useState } from "react";
 import { initializeApp } from "./services/initService";
 
@@ -66,6 +67,7 @@ const App = () => {
             <Route path="/calendar" element={<Calendar />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/stats" element={<Stats />} />
+            <Route path="/meditation" element={<Meditation />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

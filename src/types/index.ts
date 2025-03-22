@@ -47,6 +47,12 @@ export interface User {
   };
   skills: Skill[];
   achievements: Achievement[];
+  meditation?: {
+    streak: number;
+    lastMeditated: string;
+    completedMeditations: string[];
+    unlockedSecretMeditation: boolean;
+  };
 }
 
 export interface Category {
@@ -70,4 +76,17 @@ export interface Reward {
   cost: number;
   claimed: boolean;
   icon: string;
+}
+
+export interface Meditation {
+  id: string;
+  name: string;
+  description: string;
+  teacher: string;
+  instructions: string;
+  precautions: string;
+  benefits: string;
+  icon: string;
+  duration: number[];
+  isSecret?: boolean;
 }

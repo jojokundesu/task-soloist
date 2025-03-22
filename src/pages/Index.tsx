@@ -6,6 +6,7 @@ import HeroCard from '@/components/home/hero-card';
 import DailyTasks from '@/components/home/daily-tasks';
 import SkillsSection from '@/components/home/skills-section';
 import AchievementsSection from '@/components/home/achievements-section';
+import MeditationSection from '@/components/home/meditation-section';
 import { getTasks, getUser } from '@/services/storageService';
 import { Task, User } from '@/types';
 
@@ -44,6 +45,9 @@ const Index = () => {
           
           {/* Daily Tasks */}
           <DailyTasks tasks={tasks} className="animate-scale-in" />
+          
+          {/* Meditation Section */}
+          <MeditationSection className="animate-scale-in" />
           
           {/* Skills Section */}
           <SkillsSection skills={skills} className="animate-scale-in" />

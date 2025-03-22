@@ -1,5 +1,4 @@
-
-import { Task, User, Skill, Achievement, Category, Reward, DailyTask } from "@/types";
+import { Task, User, Skill, Achievement, Category, Reward, DailyTask, Meditation } from "@/types";
 
 // Keys for storage
 const STORAGE_KEYS = {
@@ -11,6 +10,8 @@ const STORAGE_KEYS = {
   REWARDS: 'tasks_soloist_rewards',
   DAILY_TASKS: 'tasks_soloist_daily_tasks',
   INITIALIZED: 'app_initialized',
+  MEDITATIONS: 'tasks_soloist_meditations',
+  MEDITATION_LOGS: 'tasks_soloist_meditation_logs',
 };
 
 // Generic get function
@@ -89,6 +90,69 @@ export const addExperience = (amount: number): void => {
   }
 };
 
+// Meditation functions
+export const getMeditationStreak = (): number => {
+  const user = getUser();
+  return user?.meditation?.streak || 0;
+};
+
+export const updateMeditationStreak = (): void => {
+  const user = getUser();
+  if (user) {
+    const today = new Date().toISOString().split('T')[0];
+    let streak = user.meditation?.streak || 0;
+    let lastMeditated = user.meditation?.lastMeditated || '';
+    let completedMeditations = user.meditation?.completedMeditations || [];
+    let unlockedSecretMeditation = user.meditation?.unlockedSecretMeditation || false;
+    
+    // If this is the first meditation or it's a different day than last meditation
+    if (!lastMeditated || lastMeditated !== today) {
+      // Check if the last meditation was yesterday
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayStr = yesterday.toISOString().split('T')[0];
+      
+      if (lastMeditated === yesterdayStr) {
+        // Consecutive day, increase streak
+        streak += 1;
+      } else if (lastMeditated !== today) {
+        // Not consecutive, reset streak
+        streak = 1;
+      }
+      
+      // Update last meditated date
+      lastMeditated = today;
+      
+      // Add to completed meditations if not already there
+      if (!completedMeditations.includes(today)) {
+        completedMeditations.push(today);
+      }
+      
+      // Check if streak has reached 7 days
+      if (streak >= 7 && !unlockedSecretMeditation) {
+        unlockedSecretMeditation = true;
+        // Could also trigger an achievement here
+      }
+      
+      // Update user
+      setUser({
+        ...user,
+        meditation: {
+          streak,
+          lastMeditated,
+          completedMeditations,
+          unlockedSecretMeditation
+        }
+      });
+    }
+  }
+};
+
+export const checkSecretMeditationUnlocked = (): boolean => {
+  const user = getUser();
+  return user?.meditation?.unlockedSecretMeditation || false;
+};
+
 // Skills
 export const getSkills = (): Skill[] => getItem<Skill[]>(STORAGE_KEYS.SKILLS, []);
 export const setSkills = (skills: Skill[]): void => setItem(STORAGE_KEYS.SKILLS, skills);
@@ -140,7 +204,20 @@ export const initializeStorage = (
   defaultRewards: Reward[]
 ): void => {
   // Only initialize if storage is empty
-  if (!getUser()) setUser(defaultUser);
+  if (!getUser()) {
+    // Ensure user has the meditation field initialized
+    const userWithMeditation = {
+      ...defaultUser,
+      meditation: {
+        streak: 0,
+        lastMeditated: '',
+        completedMeditations: [],
+        unlockedSecretMeditation: false
+      }
+    };
+    setUser(userWithMeditation);
+  }
+  
   if (getSkills().length === 0) setSkills(defaultSkills);
   if (getAchievements().length === 0) setAchievements(defaultAchievements);
   if (getCategories().length === 0) setCategories(defaultCategories);
