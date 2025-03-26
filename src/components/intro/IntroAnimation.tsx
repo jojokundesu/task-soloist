@@ -66,9 +66,29 @@ interface IntroAnimationProps {
 
 const IntroAnimation: React.FC<IntroAnimationProps> = ({ onComplete, className }) => {
   const [animationComplete, setAnimationComplete] = useState(false);
+  const [deviceOrientation, setDeviceOrientation] = useState({ beta: 0, gamma: 0 });
   
   // Generate enough shards to cover the screen
   const shardCount = 36; // 6x6 grid of shards
+  
+  // Handle device orientation changes
+  useEffect(() => {
+    const handleOrientation = (event: DeviceOrientationEvent) => {
+      if (event.beta !== null && event.gamma !== null) {
+        setDeviceOrientation({
+          beta: event.beta, // Front-to-back tilt
+          gamma: event.gamma // Left-to-right tilt
+        });
+      }
+    };
+    
+    // Add event listener for device orientation
+    window.addEventListener('deviceorientation', handleOrientation);
+    
+    return () => {
+      window.removeEventListener('deviceorientation', handleOrientation);
+    };
+  }, []);
   
   const handleShardsComplete = () => {
     setAnimationComplete(true);
@@ -89,17 +109,28 @@ const IntroAnimation: React.FC<IntroAnimationProps> = ({ onComplete, className }
           style={{ zIndex: 40 }}
         >
           {Array.from({ length: shardCount }).map((_, i) => (
-            <Shard key={i} index={i} total={shardCount} onComplete={handleShardsComplete} />
+            <Shard 
+              key={i} 
+              index={i} 
+              total={shardCount} 
+              onComplete={handleShardsComplete} 
+            />
           ))}
           
           {/* Few shards that remain in the corner */}
           <motion.div 
             className="absolute right-0 top-0 w-20 h-20 bg-black opacity-80" 
-            style={{ clipPath: 'polygon(100% 0, 100% 100%, 0 0)' }}
+            style={{ 
+              clipPath: 'polygon(100% 0, 100% 100%, 0 0)',
+              transform: `rotate(${deviceOrientation.gamma * 0.2}deg)` 
+            }}
           />
           <motion.div 
             className="absolute left-0 bottom-0 w-16 h-16 bg-black opacity-60" 
-            style={{ clipPath: 'polygon(0 100%, 100% 100%, 0 0)' }}
+            style={{ 
+              clipPath: 'polygon(0 100%, 100% 100%, 0 0)',
+              transform: `rotate(${deviceOrientation.beta * 0.2}deg)` 
+            }}
           />
         </motion.div>
       )}
