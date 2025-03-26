@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import NavBar from '@/components/navigation/nav-bar';
 import { user as defaultUser, tasks as defaultTasks, skills, achievements } from '@/data/mockData';
@@ -14,7 +15,7 @@ import { toast } from '@/components/ui/use-toast';
 
 const Index = () => {
   const [tasks, setTasks] = useState<Task[]>(defaultTasks);
-  const [user, setUser] = useState<User>(defaultUser);
+  const [user, setUserState] = useState<User>(defaultUser);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [appInitialized, setAppInitialized] = useState(false);
 
@@ -28,7 +29,7 @@ const Index = () => {
     const onboardingCompleted = localStorage.getItem('onboarding_completed');
     
     if (storedUser) {
-      setUser(storedUser);
+      setUserState(storedUser);
       setAppInitialized(true);
     }
     
@@ -52,8 +53,8 @@ const Index = () => {
       }
     };
     
-    setUser(updatedUser);
-    setUser(updatedUser);
+    setUserState(updatedUser);
+    setUser(updatedUser); // Save to localStorage using the storageService
     
     localStorage.setItem('onboarding_completed', 'true');
     setShowOnboarding(false);
