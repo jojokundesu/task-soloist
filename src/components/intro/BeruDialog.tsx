@@ -85,6 +85,7 @@ const BeruDialog: React.FC<BeruDialogProps> = ({ onComplete, className }) => {
   };
   
   const handleContinue = () => {
+    console.log("Continuing to next step from:", step);
     // Validate and format input based on the step
     switch (step) {
       case 0: // Name
@@ -106,33 +107,36 @@ const BeruDialog: React.FC<BeruDialogProps> = ({ onComplete, className }) => {
       case 5: // Body fat percentage
         const bodyFat = parseFloat(userData.bodyFatPercentage.toString());
         if (isNaN(bodyFat) || bodyFat < 0 || bodyFat > 100) return;
-        break;
+        // Final step
+        console.log("Moving to conclusion");
+        generateBeruConclusion();
+        return;
       default:
         break;
     }
     
-    // Move to the next step or complete the process
-    if (step === 5) {
-      // Final step, generate Beru's conclusion message based on user data
-      generateBeruConclusion();
-    } else {
-      setStep(step + 1);
-    }
+    // Move to the next step
+    setStep(prevStep => prevStep + 1);
   };
   
   const generateBeruConclusion = () => {
+    console.log("Generating Beru's conclusion");
     setStep(6); // Move to conclusion step
     
     const { height, weight, bodyFatPercentage } = userData;
-    const bmi = weight / ((height / 100) * (height / 100));
+    let parsedHeight = parseFloat(height.toString()) || 170;
+    let parsedWeight = parseFloat(weight.toString()) || 70;
+    let parsedBodyFat = parseFloat(bodyFatPercentage.toString()) || 15;
+    
+    const bmi = parsedWeight / ((parsedHeight / 100) * (parsedHeight / 100));
     
     let message = "";
     
-    if (bmi < 18.5 || bodyFatPercentage < 10) {
+    if (bmi < 18.5 || parsedBodyFat < 10) {
       message = `Your current state may be a little too weak to unlock your full potential, my Liege. But do not worry! With my help and your strong determination, YOU WILL REACH YOUR TRUE SELF! Until then, just let me be of service to you and guide you through this journey designed only for you.`;
-    } else if (bmi >= 30 || bodyFatPercentage > 30) {
+    } else if (bmi >= 30 || parsedBodyFat > 30) {
       message = `My Liege, your power is immense, but perhaps too concentrated. Fear not! My shadows and I shall assist you in refining this strength. Soon, all shall witness your true majesty. Let us begin this glorious path together!`;
-    } else if (bmi >= 25 || bodyFatPercentage > 20) {
+    } else if (bmi >= 25 || parsedBodyFat > 20) {
       message = `I sense great potential in you, my Liege! Your vessel is formidable, but with proper training, it shall become even more magnificent. The shadows eagerly await your command. Allow me to guide you toward your destiny!`;
     } else {
       message = `As expected of the Shadow Monarch! Your vessel is well-balanced, my Liege. The shadows tremble with excitement to serve you. Together, we shall unlock powers beyond imagination. I, Beru, pledge my eternal loyalty to your cause!`;
@@ -142,6 +146,7 @@ const BeruDialog: React.FC<BeruDialogProps> = ({ onComplete, className }) => {
     let index = 0;
     
     setIsTyping(true);
+    setDisplayText('');
     
     const typingInterval = setInterval(() => {
       if (index < message.length) {
@@ -155,6 +160,7 @@ const BeruDialog: React.FC<BeruDialogProps> = ({ onComplete, className }) => {
         
         // After conclusion is fully typed, give user time to read before proceeding
         setTimeout(() => {
+          console.log("Onboarding complete, userData:", userData);
           onComplete(userData);
         }, 3000);
       }
@@ -202,7 +208,7 @@ const BeruDialog: React.FC<BeruDialogProps> = ({ onComplete, className }) => {
               value={
                 step === 0 
                   ? userData.name 
-                  : userData[Object.keys(userData)[step] as keyof UserData].toString()
+                  : userData[Object.keys(userData)[step] as keyof UserData].toString() || ""
               }
               onChange={handleInputChange}
               className="w-full bg-opacity-20 backdrop-blur-sm border-solo-accent/30 text-center text-lg"

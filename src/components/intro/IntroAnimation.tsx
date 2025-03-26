@@ -47,12 +47,12 @@ const Shard = ({ index, total, onComplete }: ShardProps) => {
       }}
       initial={{ opacity: 1 }}
       animate={falling ? {
-        y: [0, window.innerHeight],
+        y: [0, window.innerHeight * 1.5],
         rotate: [0, Math.random() * 720 - 360],
         opacity: [1, 0.8, 0],
       } : {}}
       transition={falling ? {
-        duration: 1.5,
+        duration: 2.5,
         ease: [0.645, 0.045, 0.355, 1.000],
       } : {}}
     />
@@ -69,7 +69,7 @@ const IntroAnimation: React.FC<IntroAnimationProps> = ({ onComplete, className }
   const [deviceOrientation, setDeviceOrientation] = useState({ beta: 0, gamma: 0 });
   
   // Generate enough shards to cover the screen
-  const shardCount = 36; // 6x6 grid of shards
+  const shardCount = 49; // 7x7 grid of shards for more visual impact
   
   // Handle device orientation changes
   useEffect(() => {
@@ -85,12 +85,19 @@ const IntroAnimation: React.FC<IntroAnimationProps> = ({ onComplete, className }
     // Add event listener for device orientation
     window.addEventListener('deviceorientation', handleOrientation);
     
+    // Use a small delay before starting the animation
+    const initialDelay = setTimeout(() => {
+      console.log("Starting shard animation");
+    }, 1000);
+    
     return () => {
       window.removeEventListener('deviceorientation', handleOrientation);
+      clearTimeout(initialDelay);
     };
   }, []);
   
   const handleShardsComplete = () => {
+    console.log("Shards animation complete");
     setAnimationComplete(true);
     setTimeout(() => {
       onComplete();

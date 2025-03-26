@@ -20,6 +20,7 @@ const Index = () => {
   const [appInitialized, setAppInitialized] = useState(false);
 
   useEffect(() => {
+    console.log("Index component mounted");
     const storedTasks = getTasks();
     if (storedTasks.length > 0) {
       setTasks(storedTasks);
@@ -28,12 +29,15 @@ const Index = () => {
     const storedUser = getUser();
     const onboardingCompleted = localStorage.getItem('onboarding_completed');
     
+    console.log("Onboarding completed:", onboardingCompleted);
+    
     if (storedUser) {
       setUserState(storedUser);
       setAppInitialized(true);
     }
     
     if (!onboardingCompleted) {
+      console.log("Setting up onboarding");
       setTimeout(() => {
         setShowOnboarding(true);
       }, 500);
@@ -43,6 +47,8 @@ const Index = () => {
   }, []);
 
   const handleOnboardingComplete = (userData: UserData) => {
+    console.log("Onboarding complete callback received with data:", userData);
+    
     const updatedUser = {
       ...defaultUser,
       name: userData.name,
