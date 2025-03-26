@@ -12,6 +12,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
   const [introComplete, setIntroComplete] = useState(false);
   
   const handleIntroComplete = () => {
+    console.log("Intro animation complete, showing dialog");
     setIntroComplete(true);
   };
   

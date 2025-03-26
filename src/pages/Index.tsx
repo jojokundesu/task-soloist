@@ -33,14 +33,12 @@ const Index = () => {
     
     if (storedUser) {
       setUserState(storedUser);
-      setAppInitialized(true);
     }
     
     if (!onboardingCompleted) {
       console.log("Setting up onboarding");
-      setTimeout(() => {
-        setShowOnboarding(true);
-      }, 500);
+      // Remove the delay and show the onboarding immediately
+      setShowOnboarding(true);
     } else {
       setAppInitialized(true);
     }

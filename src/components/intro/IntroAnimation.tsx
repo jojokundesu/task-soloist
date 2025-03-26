@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
@@ -85,14 +85,11 @@ const IntroAnimation: React.FC<IntroAnimationProps> = ({ onComplete, className }
     // Add event listener for device orientation
     window.addEventListener('deviceorientation', handleOrientation);
     
-    // Use a small delay before starting the animation
-    const initialDelay = setTimeout(() => {
-      console.log("Starting shard animation");
-    }, 1000);
+    // Start the animation immediately instead of using a delay
+    console.log("Starting shard animation");
     
     return () => {
       window.removeEventListener('deviceorientation', handleOrientation);
-      clearTimeout(initialDelay);
     };
   }, []);
   
