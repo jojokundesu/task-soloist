@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -19,6 +18,9 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				'medieval': ['IM Fell English', 'serif'],
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -141,6 +143,24 @@ export default {
 						transform: 'scale(1)',
 						filter: 'brightness(1)'
 					}
+				},
+				'shard-fall': {
+					'0%': { 
+						transform: 'translateY(0) rotate(0deg)',
+						opacity: '1'
+					},
+					'100%': { 
+						transform: 'translateY(100vh) rotate(360deg)',
+						opacity: '0'
+					}
+				},
+				'typewriter': {
+					'0%': { width: '0' },
+					'100%': { width: '100%' }
+				},
+				'blink': {
+					'0%, 100%': { opacity: '1' },
+					'50%': { opacity: '0' }
 				}
 			},
 			animation: {
@@ -156,7 +176,10 @@ export default {
 				'float': 'float 6s ease-in-out infinite',
 				'level-up': 'level-up 1s ease-in-out',
 				'enter': 'fade-in 0.3s ease-out, scale-in 0.2s ease-out',
-				'exit': 'fade-out 0.3s ease-out, scale-out 0.2s ease-out'
+				'exit': 'fade-out 0.3s ease-out, scale-out 0.2s ease-out',
+				'shard-fall': 'shard-fall 1.5s ease forwards',
+				'typewriter': 'typewriter 2s steps(40, end)',
+				'blink': 'blink 1s step-end infinite'
 			}
 		}
 	},
