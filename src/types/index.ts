@@ -90,3 +90,11 @@ export interface Meditation {
   duration: number[];
   isSecret?: boolean;
 }
+
+export interface Message {
+  id: string;
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+  timestamp: string;
+  isError?: boolean;
+}
