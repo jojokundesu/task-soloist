@@ -12,12 +12,13 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
   const [introComplete, setIntroComplete] = useState(false);
   
   const handleIntroComplete = () => {
-    console.log("Intro animation complete, showing dialog");
+    console.log("Handling intro animation completion");
     setIntroComplete(true);
   };
   
   const handleBeruComplete = (userData: UserData) => {
-    console.log("Beru dialog complete with data:", userData);
+    console.log("Handling BeruDialog completion with user data:", userData);
+    // Directly pass the data to the parent's onComplete
     onComplete(userData);
   };
   

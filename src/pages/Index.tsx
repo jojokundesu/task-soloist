@@ -29,23 +29,37 @@ const Index = () => {
     const storedUser = getUser();
     const onboardingCompleted = localStorage.getItem('onboarding_completed');
     
-    console.log("Onboarding completed:", onboardingCompleted);
+    console.log("Onboarding completed status:", onboardingCompleted);
     
     if (storedUser) {
       setUserState(storedUser);
     }
     
     if (!onboardingCompleted) {
-      console.log("Setting up onboarding");
-      // Show onboarding immediately
-      setShowOnboarding(true);
+      console.log("Preparing to show onboarding");
+      // Show onboarding after a slight delay to ensure component is fully mounted
+      setTimeout(() => {
+        setShowOnboarding(true);
+      }, 100);
     } else {
+      console.log("Onboarding already completed, skipping");
       setAppInitialized(true);
     }
   }, []);
 
   const handleOnboardingComplete = (userData: UserData) => {
-    console.log("Onboarding complete callback with userData:", userData);
+    console.log("Index: Onboarding complete callback received with userData:", userData);
+    
+    if (!userData || !userData.name) {
+      console.error("Invalid user data received:", userData);
+      userData = {
+        name: "Shadow Monarch",
+        age: 25,
+        height: 175,
+        weight: 70,
+        bodyFatPercentage: 15
+      };
+    }
     
     const updatedUser = {
       ...defaultUser,
@@ -57,6 +71,8 @@ const Index = () => {
       }
     };
     
+    console.log("Updating user data:", updatedUser);
+    
     // Update state first
     setUserState(updatedUser);
     // Save to localStorage
@@ -65,9 +81,12 @@ const Index = () => {
     // Set flag to prevent showing onboarding again
     localStorage.setItem('onboarding_completed', 'true');
     
-    // Update UI state
+    // Update UI state - important to set showOnboarding to false first
     setShowOnboarding(false);
+    // Then set app as initialized
     setAppInitialized(true);
+    
+    console.log("Onboarding complete, app initialized");
     
     toast({
       title: "Welcome, Shadow Monarch!",
@@ -77,6 +96,7 @@ const Index = () => {
 
   // Show loading state if app is not initialized and onboarding is not shown
   if (!appInitialized && !showOnboarding) {
+    console.log("Rendering loading state");
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-solo-bg">
         <div className="w-10 h-10 border-4 border-solo-accent rounded-full animate-spin border-t-transparent"></div>
@@ -90,30 +110,32 @@ const Index = () => {
         <Onboarding onComplete={handleOnboardingComplete} />
       )}
       
-      <div className={`min-h-screen pb-20 pt-20 ${showOnboarding ? 'hidden' : 'block'}`}>
-        <div className="container mx-auto px-4 max-w-lg">
-          <div className="space-y-6">
-            <div className="text-center mb-4 mt-4 animate-fade-in">
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-solo-accent to-solo-highlight bg-clip-text text-transparent">
-                Task Soloist
-              </h1>
-              <p className="text-solo-secondary mt-2">Level up through daily achievements</p>
+      {appInitialized && (
+        <div className="min-h-screen pb-20 pt-20">
+          <div className="container mx-auto px-4 max-w-lg">
+            <div className="space-y-6">
+              <div className="text-center mb-4 mt-4 animate-fade-in">
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-solo-accent to-solo-highlight bg-clip-text text-transparent">
+                  Task Soloist
+                </h1>
+                <p className="text-solo-secondary mt-2">Level up through daily achievements</p>
+              </div>
+              
+              <HeroCard user={user} className="animate-scale-in" />
+              
+              <DailyTasks tasks={tasks} className="animate-scale-in" />
+              
+              <MeditationSection className="animate-scale-in" />
+              
+              <SkillsSection skills={skills} className="animate-scale-in" />
+              
+              <AchievementsSection achievements={achievements} className="animate-scale-in" />
             </div>
-            
-            <HeroCard user={user} className="animate-scale-in" />
-            
-            <DailyTasks tasks={tasks} className="animate-scale-in" />
-            
-            <MeditationSection className="animate-scale-in" />
-            
-            <SkillsSection skills={skills} className="animate-scale-in" />
-            
-            <AchievementsSection achievements={achievements} className="animate-scale-in" />
           </div>
+          
+          <NavBar />
         </div>
-        
-        <NavBar />
-      </div>
+      )}
     </>
   );
 };

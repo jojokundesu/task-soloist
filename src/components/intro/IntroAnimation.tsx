@@ -10,10 +10,10 @@ interface IntroAnimationProps {
 
 const IntroAnimation: React.FC<IntroAnimationProps> = ({ onComplete, className }) => {
   useEffect(() => {
-    // Simply wait a short time then complete
     console.log("Starting intro animation");
+    // Use a more reliable way to handle animation completion
     const timer = setTimeout(() => {
-      console.log("Intro animation complete");
+      console.log("Intro animation complete, calling onComplete callback");
       onComplete();
     }, 2000);
     
@@ -22,20 +22,22 @@ const IntroAnimation: React.FC<IntroAnimationProps> = ({ onComplete, className }
   
   return (
     <motion.div 
-      className={cn("fixed inset-0 bg-black overflow-hidden z-50", className)}
+      className={cn("fixed inset-0 bg-black z-50", className)}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 1 }}
+      transition={{ duration: 0.8 }}
     >
-      <motion.div
-        className="fixed inset-0 flex items-center justify-center"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5, duration: 1 }}
-      >
-        <h1 className="text-solo-accent text-5xl font-bold">Task Soloist</h1>
-      </motion.div>
+      <div className="fixed inset-0 flex items-center justify-center">
+        <motion.h1 
+          className="text-solo-accent text-5xl font-bold"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.8 }}
+        >
+          Task Soloist
+        </motion.h1>
+      </div>
     </motion.div>
   );
 };

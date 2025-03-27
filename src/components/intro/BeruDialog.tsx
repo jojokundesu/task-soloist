@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -32,7 +32,6 @@ const BeruDialog: React.FC<BeruDialogProps> = ({ onComplete, className }) => {
   
   const [displayText, setDisplayText] = useState('');
   const [isTyping, setIsTyping] = useState(true);
-  const [onboardingCompleted, setOnboardingCompleted] = useState(false);
   
   const questions = [
     "Please let me know your name, my Liege.",
@@ -86,7 +85,8 @@ const BeruDialog: React.FC<BeruDialogProps> = ({ onComplete, className }) => {
   };
   
   const handleContinue = () => {
-    console.log("Continuing to next step from:", step);
+    console.log("Current step:", step, "with data:", userData);
+    
     // Validate and format input based on the step
     switch (step) {
       case 0: // Name
@@ -161,112 +161,106 @@ const BeruDialog: React.FC<BeruDialogProps> = ({ onComplete, className }) => {
         
         // After conclusion is fully typed, give user time to read before proceeding
         setTimeout(() => {
-          console.log("Dialog completed, processing user data:", userData);
-          setOnboardingCompleted(true);
+          console.log("Dialog completed, finalizing with user data:", userData);
           
           // Process the user data
-          const processedUserData = {
-            name: userData.name,
-            age: Number(userData.age),
-            height: Number(userData.height),
-            weight: Number(userData.weight),
-            bodyFatPercentage: Number(userData.bodyFatPercentage)
+          const processedUserData: UserData = {
+            name: userData.name || "Shadow Monarch",
+            age: Number(userData.age) || 25,
+            height: Number(userData.height) || 175,
+            weight: Number(userData.weight) || 70,
+            bodyFatPercentage: Number(userData.bodyFatPercentage) || 15
           };
+          
+          console.log("Calling onComplete with processed data:", processedUserData);
           
           // Call onComplete with processed userData
           onComplete(processedUserData);
-        }, 3000);
+        }, 2000);
       }
     }, 30);
   };
   
-  // If onboarding is completed, return null to unmount this component
-  if (onboardingCompleted) {
-    return null;
-  }
-  
   return (
-    <AnimatePresence>
+    <motion.div
+      className={cn(
+        "flex flex-col items-center justify-center p-6 max-w-md mx-auto", 
+        className
+      )}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5 }}
+    >
       <motion.div
-        className={cn(
-          "flex flex-col items-center justify-center p-6 max-w-md mx-auto", 
-          className
-        )}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.5 }}
+        className="mb-6 text-center"
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.2, duration: 0.4 }}
       >
-        <motion.div
-          className="mb-6 text-center"
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2, duration: 0.4 }}
-        >
-          <h2 className="font-medieval text-2xl md:text-3xl text-solo-accent mb-2">
-            {displayText}
-            {isTyping && <span className="animate-pulse">|</span>}
-          </h2>
-        </motion.div>
-        
-        {typewriterComplete && step < 6 && (
-          <motion.div 
-            className="w-full mb-4"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <Label htmlFor={`input-${step}`} className="sr-only">
-              {placeholders[step]}
-            </Label>
-            <Input
-              id={`input-${step}`}
-              name={Object.keys(userData)[step] as keyof UserData}
-              placeholder={placeholders[step]}
-              value={
-                step === 0 
-                  ? userData.name 
-                  : userData[Object.keys(userData)[step] as keyof UserData].toString() || ""
-              }
-              onChange={handleInputChange}
-              className="w-full bg-opacity-20 backdrop-blur-sm border-solo-accent/30 text-center text-lg"
-              type={step === 0 ? "text" : "number"}
-              autoFocus
-              onKeyPress={(e) => {
-                if (e.key === 'Enter') {
-                  handleContinue();
-                }
-              }}
-            />
-          </motion.div>
-        )}
-        
-        {typewriterComplete && step < 6 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3, duration: 0.3 }}
-          >
-            <Button
-              onClick={handleContinue}
-              className="bg-solo-accent hover:bg-solo-accent/80 text-white"
-            >
-              Continue
-            </Button>
-          </motion.div>
-        )}
-        
-        {step === 6 && typewriterComplete && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3, duration: 0.3 }}
-          >
-            <p className="text-center text-white opacity-50 mt-4">Continuing to your journey...</p>
-          </motion.div>
-        )}
+        <h2 className="font-medieval text-2xl md:text-3xl text-solo-accent mb-2">
+          {displayText}
+          {isTyping && <span className="animate-pulse">|</span>}
+        </h2>
       </motion.div>
-    </AnimatePresence>
+      
+      {typewriterComplete && step < 6 && (
+        <motion.div 
+          className="w-full mb-4"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <Label htmlFor={`input-${step}`} className="sr-only">
+            {placeholders[step]}
+          </Label>
+          <Input
+            id={`input-${step}`}
+            name={Object.keys(userData)[step] as keyof UserData}
+            placeholder={placeholders[step]}
+            value={
+              step === 0 
+                ? userData.name 
+                : userData[Object.keys(userData)[step] as keyof UserData].toString() || ""
+            }
+            onChange={handleInputChange}
+            className="w-full bg-opacity-20 backdrop-blur-sm border-solo-accent/30 text-center text-lg"
+            type={step === 0 ? "text" : "number"}
+            autoFocus
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                handleContinue();
+              }
+            }}
+          />
+        </motion.div>
+      )}
+      
+      {typewriterComplete && step < 6 && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3, duration: 0.3 }}
+        >
+          <Button
+            onClick={handleContinue}
+            className="bg-solo-accent hover:bg-solo-accent/80 text-white"
+          >
+            Continue
+          </Button>
+        </motion.div>
+      )}
+      
+      {step === 6 && typewriterComplete && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3, duration: 0.3 }}
+        >
+          <p className="text-center text-white opacity-50 mt-4">Continuing to your journey...</p>
+        </motion.div>
+      )}
+    </motion.div>
   );
 };
 
