@@ -16,6 +16,11 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
     setIntroComplete(true);
   };
   
+  const handleBeruComplete = (userData: UserData) => {
+    console.log("Beru dialog complete, data:", userData);
+    onComplete(userData);
+  };
+  
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-b from-[#1A1F2C] to-solo-bg">
       {!introComplete ? (
@@ -27,7 +32,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
           transition={{ duration: 0.5 }}
           className="w-full h-full flex items-center justify-center"
         >
-          <BeruDialog onComplete={onComplete} />
+          <BeruDialog onComplete={handleBeruComplete} />
         </motion.div>
       )}
     </div>

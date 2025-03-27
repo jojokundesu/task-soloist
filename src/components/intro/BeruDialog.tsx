@@ -161,7 +161,17 @@ const BeruDialog: React.FC<BeruDialogProps> = ({ onComplete, className }) => {
         // After conclusion is fully typed, give user time to read before proceeding
         setTimeout(() => {
           console.log("Onboarding complete, userData:", userData);
-          onComplete(userData);
+          
+          // Ensure we process the proper user data and call onComplete to finish
+          const processedUserData = {
+            name: userData.name,
+            age: Number(userData.age),
+            height: Number(userData.height),
+            weight: Number(userData.weight),
+            bodyFatPercentage: Number(userData.bodyFatPercentage)
+          };
+          
+          onComplete(processedUserData);
         }, 3000);
       }
     }, 30);
@@ -235,6 +245,16 @@ const BeruDialog: React.FC<BeruDialogProps> = ({ onComplete, className }) => {
             >
               Continue
             </Button>
+          </motion.div>
+        )}
+        
+        {step === 6 && typewriterComplete && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.3 }}
+          >
+            <p className="text-center text-white opacity-50 mt-4">Continuing to your journey...</p>
           </motion.div>
         )}
       </motion.div>
