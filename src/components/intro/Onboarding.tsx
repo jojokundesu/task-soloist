@@ -17,7 +17,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
   };
   
   const handleBeruComplete = (userData: UserData) => {
-    console.log("Beru dialog complete, data:", userData);
+    console.log("Beru dialog complete with data:", userData);
     onComplete(userData);
   };
   

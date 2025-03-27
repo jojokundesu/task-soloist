@@ -45,7 +45,7 @@ const Index = () => {
   }, []);
 
   const handleOnboardingComplete = (userData: UserData) => {
-    console.log("Onboarding complete callback received with data:", userData);
+    console.log("Onboarding complete callback with userData:", userData);
     
     const updatedUser = {
       ...defaultUser,
@@ -57,10 +57,15 @@ const Index = () => {
       }
     };
     
+    // Update state first
     setUserState(updatedUser);
-    setUser(updatedUser); // Save to localStorage using the storageService
+    // Save to localStorage
+    setUser(updatedUser);
     
+    // Set flag to prevent showing onboarding again
     localStorage.setItem('onboarding_completed', 'true');
+    
+    // Update UI state
     setShowOnboarding(false);
     setAppInitialized(true);
     
@@ -70,6 +75,7 @@ const Index = () => {
     });
   };
 
+  // Show loading state if app is not initialized and onboarding is not shown
   if (!appInitialized && !showOnboarding) {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-solo-bg">

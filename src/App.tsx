@@ -32,6 +32,7 @@ const App = () => {
 
   // Initialize the app with default data from localStorage on startup
   useEffect(() => {
+    console.log("Initializing app...");
     // Initialize the app data
     initializeApp();
     setIsInitialized(true);
@@ -51,7 +52,11 @@ const App = () => {
 
   // Show nothing until initialization is complete
   if (!isInitialized) {
-    return null;
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-solo-bg">
+        <div className="w-10 h-10 border-4 border-solo-accent rounded-full animate-spin border-t-transparent"></div>
+      </div>
+    );
   }
 
   return (

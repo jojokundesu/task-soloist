@@ -32,6 +32,7 @@ const BeruDialog: React.FC<BeruDialogProps> = ({ onComplete, className }) => {
   
   const [displayText, setDisplayText] = useState('');
   const [isTyping, setIsTyping] = useState(true);
+  const [onboardingCompleted, setOnboardingCompleted] = useState(false);
   
   const questions = [
     "Please let me know your name, my Liege.",
@@ -160,9 +161,10 @@ const BeruDialog: React.FC<BeruDialogProps> = ({ onComplete, className }) => {
         
         // After conclusion is fully typed, give user time to read before proceeding
         setTimeout(() => {
-          console.log("Onboarding complete, userData:", userData);
+          console.log("Dialog completed, processing user data:", userData);
+          setOnboardingCompleted(true);
           
-          // Ensure we process the proper user data and call onComplete to finish
+          // Process the user data
           const processedUserData = {
             name: userData.name,
             age: Number(userData.age),
@@ -171,11 +173,17 @@ const BeruDialog: React.FC<BeruDialogProps> = ({ onComplete, className }) => {
             bodyFatPercentage: Number(userData.bodyFatPercentage)
           };
           
+          // Call onComplete with processed userData
           onComplete(processedUserData);
         }, 3000);
       }
     }, 30);
   };
+  
+  // If onboarding is completed, return null to unmount this component
+  if (onboardingCompleted) {
+    return null;
+  }
   
   return (
     <AnimatePresence>

@@ -11,9 +11,9 @@ interface IntroAnimationProps {
 const IntroAnimation: React.FC<IntroAnimationProps> = ({ onComplete, className }) => {
   useEffect(() => {
     // Simply wait a short time then complete
-    console.log("Starting simplified intro animation");
+    console.log("Starting intro animation");
     const timer = setTimeout(() => {
-      console.log("Simplified intro animation complete");
+      console.log("Intro animation complete");
       onComplete();
     }, 2000);
     
@@ -22,12 +22,11 @@ const IntroAnimation: React.FC<IntroAnimationProps> = ({ onComplete, className }
   
   return (
     <motion.div 
-      className={cn("fixed inset-0 bg-black overflow-hidden", className)}
+      className={cn("fixed inset-0 bg-black overflow-hidden z-50", className)}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 1 }}
-      style={{ zIndex: 40 }}
     >
       <motion.div
         className="fixed inset-0 flex items-center justify-center"
