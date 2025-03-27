@@ -13,6 +13,7 @@ const Shard = ({ index, total, onComplete }: ShardProps) => {
   const [falling, setFalling] = useState(false);
   
   useEffect(() => {
+    // Start falling with a staggered delay
     const timeout = setTimeout(() => {
       setFalling(true);
       
@@ -85,7 +86,7 @@ const IntroAnimation: React.FC<IntroAnimationProps> = ({ onComplete, className }
     // Add event listener for device orientation
     window.addEventListener('deviceorientation', handleOrientation);
     
-    // Start the animation immediately instead of using a delay
+    // Start the animation immediately
     console.log("Starting shard animation");
     
     return () => {
@@ -102,43 +103,32 @@ const IntroAnimation: React.FC<IntroAnimationProps> = ({ onComplete, className }
   };
   
   return (
-    <AnimatePresence>
-      {!animationComplete && (
-        <motion.div
-          className={cn("fixed inset-0 bg-black overflow-hidden", className)}
-          initial={{ opacity: 1 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          style={{ zIndex: 40 }}
-        >
-          {Array.from({ length: shardCount }).map((_, i) => (
-            <Shard 
-              key={i} 
-              index={i} 
-              total={shardCount} 
-              onComplete={handleShardsComplete} 
-            />
-          ))}
-          
-          {/* Few shards that remain in the corner */}
-          <motion.div 
-            className="absolute right-0 top-0 w-20 h-20 bg-black opacity-80" 
-            style={{ 
-              clipPath: 'polygon(100% 0, 100% 100%, 0 0)',
-              transform: `rotate(${deviceOrientation.gamma * 0.2}deg)` 
-            }}
-          />
-          <motion.div 
-            className="absolute left-0 bottom-0 w-16 h-16 bg-black opacity-60" 
-            style={{ 
-              clipPath: 'polygon(0 100%, 100% 100%, 0 0)',
-              transform: `rotate(${deviceOrientation.beta * 0.2}deg)` 
-            }}
-          />
-        </motion.div>
-      )}
-    </AnimatePresence>
+    <div className={cn("fixed inset-0 bg-black overflow-hidden", className)} style={{ zIndex: 40 }}>
+      {Array.from({ length: shardCount }).map((_, i) => (
+        <Shard 
+          key={i} 
+          index={i} 
+          total={shardCount} 
+          onComplete={handleShardsComplete} 
+        />
+      ))}
+      
+      {/* Few shards that remain in the corner */}
+      <motion.div 
+        className="absolute right-0 top-0 w-20 h-20 bg-black opacity-80" 
+        style={{ 
+          clipPath: 'polygon(100% 0, 100% 100%, 0 0)',
+          transform: `rotate(${deviceOrientation.gamma * 0.2}deg)` 
+        }}
+      />
+      <motion.div 
+        className="absolute left-0 bottom-0 w-16 h-16 bg-black opacity-60" 
+        style={{ 
+          clipPath: 'polygon(0 100%, 100% 100%, 0 0)',
+          transform: `rotate(${deviceOrientation.beta * 0.2}deg)` 
+        }}
+      />
+    </div>
   );
 };
 

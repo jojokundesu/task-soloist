@@ -37,7 +37,7 @@ const Index = () => {
     
     if (!onboardingCompleted) {
       console.log("Setting up onboarding");
-      // Remove the delay and show the onboarding immediately
+      // Show onboarding immediately
       setShowOnboarding(true);
     } else {
       setAppInitialized(true);
@@ -84,7 +84,7 @@ const Index = () => {
         <Onboarding onComplete={handleOnboardingComplete} />
       )}
       
-      <div className={`min-h-screen pb-20 pt-20 ${showOnboarding ? 'opacity-0' : 'opacity-100 transition-opacity duration-500'}`}>
+      <div className={`min-h-screen pb-20 pt-20 ${showOnboarding ? 'hidden' : 'block'}`}>
         <div className="container mx-auto px-4 max-w-lg">
           <div className="space-y-6">
             <div className="text-center mb-4 mt-4 animate-fade-in">
