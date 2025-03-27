@@ -18,6 +18,7 @@ const Index = () => {
   const [user, setUserState] = useState<User>(defaultUser);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [appInitialized, setAppInitialized] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     console.log("Index component mounted");
@@ -40,34 +41,36 @@ const Index = () => {
       // Show onboarding after a slight delay to ensure component is fully mounted
       setTimeout(() => {
         setShowOnboarding(true);
+        setLoading(false);
       }, 100);
     } else {
       console.log("Onboarding already completed, skipping");
       setAppInitialized(true);
+      setLoading(false);
     }
   }, []);
 
   const handleOnboardingComplete = (userData: UserData) => {
     console.log("Index: Onboarding complete callback received with userData:", userData);
     
-    if (!userData || !userData.name) {
-      console.error("Invalid user data received:", userData);
-      userData = {
-        name: "Shadow Monarch",
-        age: 25,
-        height: 175,
-        weight: 70,
-        bodyFatPercentage: 15
-      };
-    }
+    // Validate userData to prevent errors
+    const validatedUserData: UserData = {
+      name: userData?.name || "Shadow Monarch",
+      age: Number(userData?.age) || 25,
+      height: Number(userData?.height) || 175,
+      weight: Number(userData?.weight) || 70,
+      bodyFatPercentage: Number(userData?.bodyFatPercentage) || 15
+    };
+    
+    console.log("Validated user data:", validatedUserData);
     
     const updatedUser = {
       ...defaultUser,
-      name: userData.name,
+      name: validatedUserData.name,
       stats: {
         ...defaultUser.stats,
-        strength: userData.bodyFatPercentage < 15 ? 8 : 10,
-        endurance: userData.bodyFatPercentage > 25 ? 8 : 10,
+        strength: validatedUserData.bodyFatPercentage < 15 ? 8 : 10,
+        endurance: validatedUserData.bodyFatPercentage > 25 ? 8 : 10,
       }
     };
     
@@ -95,7 +98,7 @@ const Index = () => {
   };
 
   // Show loading state if app is not initialized and onboarding is not shown
-  if (!appInitialized && !showOnboarding) {
+  if (loading) {
     console.log("Rendering loading state");
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-solo-bg">

@@ -94,20 +94,16 @@ const BeruDialog: React.FC<BeruDialogProps> = ({ onComplete, className }) => {
         break;
       case 1: // First age input
       case 2: // "Real" age
-        const age = parseInt(userData.age.toString());
-        if (isNaN(age) || age <= 0) return;
+        if (isNaN(Number(userData.age)) || Number(userData.age) <= 0) return;
         break;
       case 3: // Height
-        const height = parseFloat(userData.height.toString());
-        if (isNaN(height) || height <= 0) return;
+        if (isNaN(Number(userData.height)) || Number(userData.height) <= 0) return;
         break;
       case 4: // Weight
-        const weight = parseFloat(userData.weight.toString());
-        if (isNaN(weight) || weight <= 0) return;
+        if (isNaN(Number(userData.weight)) || Number(userData.weight) <= 0) return;
         break;
       case 5: // Body fat percentage
-        const bodyFat = parseFloat(userData.bodyFatPercentage.toString());
-        if (isNaN(bodyFat) || bodyFat < 0 || bodyFat > 100) return;
+        if (isNaN(Number(userData.bodyFatPercentage)) || Number(userData.bodyFatPercentage) < 0 || Number(userData.bodyFatPercentage) > 100) return;
         // Final step
         console.log("Moving to conclusion");
         generateBeruConclusion();
@@ -125,9 +121,9 @@ const BeruDialog: React.FC<BeruDialogProps> = ({ onComplete, className }) => {
     setStep(6); // Move to conclusion step
     
     const { height, weight, bodyFatPercentage } = userData;
-    let parsedHeight = parseFloat(height.toString()) || 170;
-    let parsedWeight = parseFloat(weight.toString()) || 70;
-    let parsedBodyFat = parseFloat(bodyFatPercentage.toString()) || 15;
+    let parsedHeight = Number(height) || 170;
+    let parsedWeight = Number(weight) || 70;
+    let parsedBodyFat = Number(bodyFatPercentage) || 15;
     
     const bmi = parsedWeight / ((parsedHeight / 100) * (parsedHeight / 100));
     
@@ -181,6 +177,12 @@ const BeruDialog: React.FC<BeruDialogProps> = ({ onComplete, className }) => {
     }, 30);
   };
   
+  // Fix the rendering to safely handle potential undefined values
+  const getInputValue = (key: keyof UserData): string => {
+    const value = userData[key];
+    return value !== undefined && value !== null ? String(value) : '';
+  };
+  
   return (
     <motion.div
       className={cn(
@@ -218,11 +220,7 @@ const BeruDialog: React.FC<BeruDialogProps> = ({ onComplete, className }) => {
             id={`input-${step}`}
             name={Object.keys(userData)[step] as keyof UserData}
             placeholder={placeholders[step]}
-            value={
-              step === 0 
-                ? userData.name 
-                : userData[Object.keys(userData)[step] as keyof UserData].toString() || ""
-            }
+            value={getInputValue(Object.keys(userData)[step] as keyof UserData)}
             onChange={handleInputChange}
             className="w-full bg-opacity-20 backdrop-blur-sm border-solo-accent/30 text-center text-lg"
             type={step === 0 ? "text" : "number"}
