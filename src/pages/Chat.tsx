@@ -18,7 +18,7 @@ const Chat = () => {
 
   return (
     <div className="min-h-screen pb-20 pt-20">
-      <div className="container mx-auto px-4 max-w-lg">
+      <div className="container mx-auto px-4 max-w-4xl">
         <div className="text-center mb-6">
           <h1 className="text-3xl font-bold bg-gradient-to-r from-solo-accent to-solo-highlight bg-clip-text text-transparent">
             Consult with Beru
@@ -33,7 +33,7 @@ const Chat = () => {
           </button>
         </div>
         
-        {showChat && <ChatInterface />}
+        {showChat && <ChatInterface className="w-full" />}
       </div>
       
       <ShatterAnimation 

@@ -15,6 +15,8 @@ import Meditation from "./pages/Meditation";
 import Chat from "./pages/Chat";
 import { useEffect, useState } from "react";
 import { initializeApp } from "./services/initService";
+import Onboarding from "./components/intro/Onboarding";
+import { UserData } from "./components/intro/BeruDialog";
 
 // Configure the QueryClient for offline-first behavior
 const queryClient = new QueryClient({
@@ -30,6 +32,10 @@ const queryClient = new QueryClient({
 
 const App = () => {
   const [isInitialized, setIsInitialized] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [onboardingComplete, setOnboardingComplete] = useState(
+    localStorage.getItem("onboardingComplete") === "true"
+  );
 
   // Initialize the app with default data from localStorage on startup
   useEffect(() => {
@@ -37,6 +43,15 @@ const App = () => {
     // Initialize the app data
     initializeApp();
     setIsInitialized(true);
+    
+    // Check if onboarding should be shown
+    console.log("Onboarding completed status:", localStorage.getItem("onboardingComplete") === "true");
+    if (localStorage.getItem("onboardingComplete") !== "true") {
+      console.log("Showing onboarding...");
+      setShowOnboarding(true);
+    } else {
+      console.log("Onboarding already completed, skipping");
+    }
     
     // Listen for app going online/offline and handle accordingly
     const handleOnline = () => console.log("App is online");
@@ -50,6 +65,14 @@ const App = () => {
       window.removeEventListener('offline', handleOffline);
     };
   }, []);
+
+  const handleOnboardingComplete = (userData: UserData) => {
+    // Save user data
+    localStorage.setItem("userData", JSON.stringify(userData));
+    localStorage.setItem("onboardingComplete", "true");
+    setOnboardingComplete(true);
+    setShowOnboarding(false);
+  };
 
   // Show nothing until initialization is complete
   if (!isInitialized) {
@@ -65,6 +88,9 @@ const App = () => {
       <TooltipProvider>
         <Toaster />
         <Sonner />
+        {showOnboarding && !onboardingComplete && (
+          <Onboarding onComplete={handleOnboardingComplete} />
+        )}
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
