@@ -155,7 +155,8 @@ const BeruDialog: React.FC<BeruDialogProps> = ({ onComplete, className }) => {
         setIsTyping(false);
         setTypewriterComplete(true);
         
-        // After conclusion is fully typed, give user time to read before proceeding
+        // After conclusion is fully typed, give user more time to read before proceeding
+        // Increased from 2000ms to 8000ms (8 seconds)
         setTimeout(() => {
           console.log("Dialog completed, finalizing with user data:", userData);
           
@@ -172,7 +173,7 @@ const BeruDialog: React.FC<BeruDialogProps> = ({ onComplete, className }) => {
           
           // Call onComplete with processed userData
           onComplete(processedUserData);
-        }, 2000);
+        }, 8000); // Increased from 2000ms to 8000ms
       }
     }, 30);
   };

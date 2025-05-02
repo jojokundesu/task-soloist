@@ -17,6 +17,7 @@ import { useEffect, useState } from "react";
 import { initializeApp } from "./services/initService";
 import Onboarding from "./components/intro/Onboarding";
 import { UserData } from "./components/intro/BeruDialog";
+import BeruHelp from "./components/help/BeruHelp";
 
 // Configure the QueryClient for offline-first behavior
 const queryClient = new QueryClient({
@@ -103,6 +104,7 @@ const App = () => {
             <Route path="/chat" element={<Chat />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <BeruHelp />
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
