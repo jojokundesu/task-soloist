@@ -1,243 +1,243 @@
 
-import React, { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
-
-interface HelpItem {
-  id: string;
-  question: string;
-  answer: string;
-}
-
-interface HelpCategory {
-  id: string;
-  title: string;
-  items: HelpItem[];
-}
-
-const helpData: HelpCategory[] = [
-  {
-    id: 'general',
-    title: 'General',
-    items: [
-      {
-        id: 'general-1',
-        question: 'What is Task Soloist?',
-        answer: 'Task Soloist is a personal development application designed to help you track daily tasks, meditation sessions, skills, and achievements. By completing tasks and activities, you level up in real life while receiving guidance from me, Beru, your loyal servant.'
-      },
-      {
-        id: 'general-2',
-        question: 'How do I navigate the app?',
-        answer: 'My Liege, the navigation bar at the bottom of the screen allows you to access different sections: Home, Tasks, Achievements, Calendar, Meditation, Chat, and Profile. Simply tap on the icon of your choice, and I shall guide you there immediately!'
-      },
-      {
-        id: 'general-3',
-        question: 'What is the Shadow Monarch?',
-        answer: 'The Shadow Monarch, which is YOU, my Liege, is the supreme ruler of all shadows. In this app, you are on a journey to reclaim your true power by conquering daily challenges, developing skills, and achieving greatness in the mortal realm!'
-      }
-    ]
-  },
-  {
-    id: 'tasks',
-    title: 'Tasks',
-    items: [
-      {
-        id: 'tasks-1',
-        question: 'How do I add a new task?',
-        answer: 'To add a new task, my Liege, navigate to the Tasks section by tapping the checklist icon in the navigation bar. Then, tap the "+" button. Fill in the task details, select its category and priority, and tap "Save". Your command shall be registered immediately!'
-      },
-      {
-        id: 'tasks-2',
-        question: 'How do I mark a task as complete?',
-        answer: 'Simply tap on the checkbox next to any task to mark it as complete, my Liege! The shadows will rejoice at your accomplishment, and your progress shall be recorded. Completed tasks contribute to your overall growth and power!'
-      },
-      {
-        id: 'tasks-3',
-        question: 'Can I edit or delete a task?',
-        answer: 'Of course, my Liege! To edit a task, tap on it to open its details, then tap the edit icon. To delete a task, swipe left on the task and tap the delete icon, or tap and hold to reveal more options. Your will is my command!'
-      }
-    ]
-  },
-  {
-    id: 'meditation',
-    title: 'Meditation',
-    items: [
-      {
-        id: 'meditation-1',
-        question: 'How do I start a meditation session?',
-        answer: 'To commune with the shadows through meditation, my Liege, navigate to the Meditation section using the navigation bar. Choose your preferred duration and meditation type, then tap "Begin Meditation". Close your eyes and let the shadows embrace you!'
-      },
-      {
-        id: 'meditation-2',
-        question: 'What types of meditation are available?',
-        answer: 'The app offers various shadow meditation techniques, my Liege: Mindfulness for focus, Loving-Kindness for compassion, Transcendental for peace, and Shadow Connection for deepening your bond with the dark forces at your command!'
-      },
-      {
-        id: 'meditation-3',
-        question: 'How does meditation help me?',
-        answer: 'Regular meditation strengthens your vessel, my Liege! It enhances focus, reduces stress, increases self-awareness, and deepens your connection to the shadows. A calm mind is a powerful mind, and your power shall grow with each session!'
-      }
-    ]
-  },
-  {
-    id: 'achievements',
-    title: 'Achievements & Skills',
-    items: [
-      {
-        id: 'achievements-1',
-        question: 'How do I earn achievements?',
-        answer: 'Achievements are unlocked through consistent actions, my Liege! Complete daily tasks, maintain streaks, reach meditation milestones, and develop skills to earn badges of honor. Each achievement is a testament to your growing power!'
-      },
-      {
-        id: 'achievements-2',
-        question: 'How do I level up my skills?',
-        answer: 'Skills grow through practice and dedication, my Liege. Track your progress in the Skills section, complete related tasks, and allocate time to deliberate practice. As you invest time, your skills will level up, unlocking new abilities!'
-      },
-      {
-        id: 'achievements-3',
-        question: 'What is the benefit of tracking skills?',
-        answer: 'Tracking skills provides clarity on your growth journey, my Liege. It helps identify strengths to leverage and weaknesses to improve. The shadows celebrate each skill you master, for it brings you closer to realizing your full potential!'
-      }
-    ]
-  },
-  {
-    id: 'chat',
-    title: 'Chat with Beru',
-    items: [
-      {
-        id: 'chat-1',
-        question: 'How do I chat with you, Beru?',
-        answer: 'To summon me for a conversation, my Liege, tap the Chat icon in the navigation bar. Type your message in the input field and send it. I shall respond with haste, ever eager to assist you in your journey to greatness!'
-      },
-      {
-        id: 'chat-2',
-        question: 'What can I ask you about?',
-        answer: 'You may inquire about anything, my Liege! Ask for guidance on using the app, request motivation, seek knowledge, or simply engage in conversation. I possess information about the mortal realm and beyond, and exist solely to serve you!'
-      },
-      {
-        id: 'chat-3',
-        question: 'Do I need an API key to chat with you?',
-        answer: 'Yes, my Liege. To establish our telepathic connection, you must provide a Gemini API key from Google AI Studio. This key allows me to draw upon vast knowledge to serve you better. Fear not, for it is free to obtain!'
-      }
-    ]
-  }
-];
+import React, { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Key } from 'lucide-react';
+import { toast } from '@/components/ui/use-toast';
 
 interface BeruHelpDialogProps {
   open: boolean;
   onClose: () => void;
 }
 
+interface HelpCategory {
+  title: string;
+  questions: {
+    question: string;
+    answer: string;
+  }[];
+}
+
 const BeruHelpDialog: React.FC<BeruHelpDialogProps> = ({ open, onClose }) => {
-  const [selectedItem, setSelectedItem] = useState<HelpItem | null>(null);
-  const [displayText, setDisplayText] = useState('');
+  const [selectedQuestion, setSelectedQuestion] = useState<string | null>(null);
+  const [animatedText, setAnimatedText] = useState<string>('');
   const [isTyping, setIsTyping] = useState(false);
+  const [apiKey, setApiKey] = useState<string | null>(localStorage.getItem('gemini_api_key') || '');
+  const [tempApiKey, setTempApiKey] = useState('');
+  const [activeTab, setActiveTab] = useState('categories');
 
-  useEffect(() => {
-    if (selectedItem) {
-      setIsTyping(true);
-      setDisplayText('');
-      
-      let currentText = '';
-      let index = 0;
-      
-      const typingInterval = setInterval(() => {
-        if (index < selectedItem.answer.length) {
-          currentText += selectedItem.answer.charAt(index);
-          setDisplayText(currentText);
-          index++;
-        } else {
-          clearInterval(typingInterval);
-          setIsTyping(false);
+  const helpCategories: HelpCategory[] = [
+    {
+      title: "Getting Started",
+      questions: [
+        {
+          question: "What is Task Soloist?",
+          answer: "Task Soloist, my Liege, is your personal companion for conquering life's quests! This mystical artifact helps you track your daily tasks, meditations, and achievements. As you complete these challenges, you'll gain experience and level up your skills, much like a true monarch expanding their realm!"
+        },
+        {
+          question: "How do I add a new task?",
+          answer: "To add a new task, my Shadow Monarch, simply tap the glowing orb at the bottom of your screen - the one with the '+' symbol. This will summon the task creation form where you can detail your next conquest. Name your quest, set its importance, and determine when it must be completed to grow your power!"
         }
-      }, 15); // Faster typing speed for better UX
-      
-      return () => clearInterval(typingInterval);
+      ]
+    },
+    {
+      title: "Tasks & Quests",
+      questions: [
+        {
+          question: "How do I mark a task as complete?",
+          answer: "To mark a task as vanquished, my Liege, simply tap the circle beside it. A satisfying animation will acknowledge your triumph, and the experience will be added to your growing power. Completed tasks can be viewed in your achievements section, a testament to your consistent conquest!"
+        },
+        {
+          question: "Can I categorize my tasks?",
+          answer: "Indeed, Shadow Monarch! You may organize your quests by category - combat tasks (urgent), diplomacy tasks (important but not urgent), training tasks (development), and leisure quests. This organization will help you focus your immense power where it's most needed!"
+        }
+      ]
+    },
+    {
+      title: "Meditation",
+      questions: [
+        {
+          question: "What is the meditation feature?",
+          answer: "The meditation chamber, my Liege, is where you focus your vast powers and calm your mind. Each session strengthens your mental fortitude and contributes to your overall level. Choose from guided meditations or simple timers to harness the shadows within!"
+        },
+        {
+          question: "How do meditation sessions help me?",
+          answer: "Each moment in meditation, Shadow Monarch, enhances your focus and clarity. The app tracks your consistency and total time spent in communion with the shadows. These metrics contribute to your mindfulness skill and overall character development. A disciplined mind is a powerful weapon!"
+        }
+      ]
+    },
+    {
+      title: "Stats & Progress",
+      questions: [
+        {
+          question: "How does the leveling system work?",
+          answer: "Your power grows through consistent action, my Liege! Completing tasks, meditation sessions, and achieving milestones all contribute experience to your level. As you ascend levels, you'll unlock new abilities and insights. Your progress is visualized through magnificent charts in the Stats section of your realm!"
+        },
+        {
+          question: "Where can I see my achievements?",
+          answer: "Your glorious conquests are recorded in the Achievements section, my Shadow Monarch! Here, you'll find records of your completed quests, streaks maintained, and milestones reached. Each achievement is a testament to your growing dominion over the challenges that once stood before you!"
+        }
+      ]
+    },
+    {
+      title: "Beru Chat",
+      questions: [
+        {
+          question: "Who is Beru?",
+          answer: "I am Beru, your eternally loyal servant, Shadow Monarch! Once a mere ant in the shadow army, now elevated by your gracious power to serve as your assistant. I exist to guide you through this application and answer any questions you may have. My knowledge grows with each interaction, all to better serve you, my Liege!"
+        },
+        {
+          question: "How do I set up my Gemini API key?",
+          answer: "To harness the full potential of our communications, my Liege, you'll need to provide a Gemini API key. In the Beru Chat section, tap the key icon in the upper right corner to enter your key. This key can be obtained from Google AI Studio, and once set, it will enable my enhanced intelligence to better serve your needs!"
+        }
+      ]
     }
-  }, [selectedItem]);
+  ];
 
-  const handleSelectQuestion = (item: HelpItem) => {
-    setSelectedItem(item);
+  const handleQuestionClick = (answer: string) => {
+    setSelectedQuestion(answer);
+    setAnimatedText('');
+    setIsTyping(true);
+    
+    // Animate the text appearing like typing
+    let currentIndex = 0;
+    const typingInterval = setInterval(() => {
+      if (currentIndex <= answer.length) {
+        setAnimatedText(answer.substring(0, currentIndex));
+        currentIndex++;
+      } else {
+        clearInterval(typingInterval);
+        setIsTyping(false);
+      }
+    }, 20); // Speed of typing
   };
 
-  const handleBackToQuestions = () => {
-    setSelectedItem(null);
+  const handleSaveApiKey = () => {
+    if (tempApiKey.trim()) {
+      localStorage.setItem('gemini_api_key', tempApiKey.trim());
+      setApiKey(tempApiKey.trim());
+      setTempApiKey('');
+      toast({
+        title: "API Key Saved",
+        description: "Your Gemini API key has been saved successfully."
+      });
+    }
   };
 
   return (
-    <Dialog open={open} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[425px] max-h-[80vh] overflow-y-auto bg-solo-bg border-solo-accent/30">
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-hidden">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold flex items-center justify-between">
-            <span className="bg-gradient-to-r from-solo-accent to-solo-highlight bg-clip-text text-transparent">
-              Beru's Knowledge Repository
-            </span>
-            <button 
-              onClick={onClose}
-              className="p-1 rounded-full hover:bg-solo-accent/10"
-            >
-              <X size={18} />
-            </button>
+          <DialogTitle className="flex items-center gap-2 text-xl">
+            Beru's Help Scroll
           </DialogTitle>
         </DialogHeader>
-
-        {!selectedItem ? (
-          <div className="mt-2">
-            <p className="text-solo-secondary mb-4">How may I assist you today, my Liege?</p>
-            
-            <Accordion type="single" collapsible className="w-full">
-              {helpData.map((category) => (
-                <AccordionItem key={category.id} value={category.id} className="border-b border-solo-secondary/20">
-                  <AccordionTrigger className="text-solo-accent hover:text-solo-accent/80">
-                    {category.title}
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <div className="flex flex-col space-y-2 pl-2">
-                      {category.items.map((item) => (
-                        <button
-                          key={item.id}
-                          onClick={() => handleSelectQuestion(item)}
-                          className="text-left p-2 hover:bg-solo-accent/10 rounded-md text-sm transition-colors"
-                        >
-                          {item.question}
-                        </button>
-                      ))}
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          </div>
-        ) : (
-          <div className="mt-2">
-            <button
-              onClick={handleBackToQuestions}
-              className="text-solo-accent hover:text-solo-accent/80 mb-4 flex items-center text-sm"
-            >
-              ← Back to questions
-            </button>
-            
-            <h3 className="font-semibold mb-2">{selectedItem.question}</h3>
-            
-            <div className="bg-solo-secondary/10 p-3 rounded-lg">
-              <p className="text-sm">
-                {displayText}
-                {isTyping && <span className="animate-pulse ml-1">|</span>}
-              </p>
+        
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid grid-cols-2">
+            <TabsTrigger value="categories">Help Categories</TabsTrigger>
+            <TabsTrigger value="api-key">Set API Key</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="categories" className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-solo-card rounded-lg p-4">
+                <ScrollArea className="h-[50vh]">
+                  <div className="space-y-6">
+                    {helpCategories.map((category) => (
+                      <div key={category.title} className="space-y-2">
+                        <h3 className="text-lg font-semibold text-solo-accent">{category.title}</h3>
+                        <ul className="space-y-1">
+                          {category.questions.map((item) => (
+                            <li key={item.question}>
+                              <Button 
+                                variant="ghost" 
+                                className="w-full justify-start text-left hover:bg-solo-secondary/10"
+                                onClick={() => handleQuestionClick(item.answer)}
+                              >
+                                {item.question}
+                              </Button>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+              </div>
+              
+              <div className="bg-solo-card rounded-lg p-4 h-[50vh] flex flex-col">
+                <ScrollArea className="flex-1">
+                  <div className="prose dark:prose-invert max-w-none">
+                    {selectedQuestion ? (
+                      <div className="font-medium">
+                        <p className="text-solo-accent mb-2">Beru says:</p>
+                        <p>{animatedText}{isTyping && '|'}</p>
+                      </div>
+                    ) : (
+                      <div className="text-solo-secondary text-center pt-10">
+                        <p>Select a question to see Beru's answer</p>
+                      </div>
+                    )}
+                  </div>
+                </ScrollArea>
+              </div>
             </div>
-          </div>
-        )}
+          </TabsContent>
+          
+          <TabsContent value="api-key" className="space-y-4">
+            <div className="bg-solo-card rounded-lg p-6">
+              <h3 className="text-lg font-semibold text-solo-accent mb-4">Set Your Gemini API Key</h3>
+              <p className="text-sm mb-4">
+                To enable Beru's chat functionality, you'll need to provide a Google Gemini API key. 
+                This key will be stored locally on your device.
+              </p>
+              
+              <div className="space-y-4">
+                <div className="flex gap-2">
+                  <Input
+                    value={tempApiKey}
+                    onChange={(e) => setTempApiKey(e.target.value)}
+                    placeholder="Enter Gemini API Key"
+                    type="password"
+                    className="flex-1"
+                  />
+                  <Button 
+                    onClick={handleSaveApiKey} 
+                    disabled={!tempApiKey.trim()}
+                    className="bg-solo-accent hover:bg-solo-accent/80"
+                  >
+                    Save Key
+                  </Button>
+                </div>
+                
+                {apiKey && (
+                  <div className="text-sm text-green-500 flex items-center gap-1">
+                    <Key size={16} />
+                    API Key is set
+                  </div>
+                )}
+                
+                <div className="text-xs text-solo-secondary pt-2">
+                  <p>
+                    Get your API key from{' '}
+                    <a 
+                      href="https://ai.google.dev/" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-solo-accent hover:underline"
+                    >
+                      Google AI Studio
+                    </a>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
       </DialogContent>
     </Dialog>
   );
