@@ -7,6 +7,7 @@ import { Spinner } from '@/components/ui/spinner';
 import ChatMessage from './ChatMessage';
 import { Message } from '@/types';
 import { toast } from '@/components/ui/use-toast';
+import { Textarea } from '@/components/ui/textarea';
 
 interface ChatInterfaceProps {
   className?: string;
@@ -35,6 +36,17 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ className }) => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+  
+  useEffect(() => {
+    // Check for API key on component mount
+    const savedKey = localStorage.getItem('gemini_api_key');
+    if (savedKey) {
+      setApiKey(savedKey);
+    } else {
+      // Show API key prompt if no key is saved
+      setIsSettingApiKey(true);
+    }
+  }, []);
 
   const handleSendMessage = async () => {
     if (!input.trim()) return;
@@ -128,7 +140,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ className }) => {
     
     try {
       // Use proper format for the Gemini API
-      // Note: The API expects a different format than what we had before
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: {
@@ -158,7 +169,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ className }) => {
       }
       
       const data = await response.json();
-      console.log("API Response:", data);
       
       if (!data.candidates || data.candidates.length === 0) {
         throw new Error("No response generated from Gemini API");
@@ -171,16 +181,57 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ className }) => {
     }
   };
 
-  const handleSaveApiKey = () => {
+  const handleSaveApiKey = async () => {
     if (tempApiKey.trim()) {
-      localStorage.setItem('gemini_api_key', tempApiKey.trim());
-      setApiKey(tempApiKey.trim());
-      setIsSettingApiKey(false);
-      setTempApiKey('');
-      toast({
-        title: "API Key Saved",
-        description: "Your Gemini API key has been saved successfully."
-      });
+      setIsLoading(true);
+      
+      try {
+        // Test the API key before saving
+        const testResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${tempApiKey.trim()}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contents: [
+              {
+                role: "user",
+                parts: [{ text: "Hello, this is a test message. Please respond with 'API key working!' if you receive this." }]
+              }
+            ],
+            generationConfig: {
+              temperature: 0.7,
+              maxOutputTokens: 100,
+            }
+          }),
+        });
+        
+        if (!testResponse.ok) {
+          throw new Error(`API Key validation failed with status: ${testResponse.status}`);
+        }
+        
+        // Key is valid, save it
+        localStorage.setItem('gemini_api_key', tempApiKey.trim());
+        setApiKey(tempApiKey.trim());
+        setIsSettingApiKey(false);
+        setTempApiKey('');
+        
+        toast({
+          title: "API Key Verified",
+          description: "Your Gemini API key has been verified and saved successfully.",
+          variant: "default",
+        });
+        
+      } catch (error) {
+        console.error('API Key Validation Error:', error);
+        toast({
+          title: "Invalid API Key",
+          description: "The API key could not be verified. Please check and try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -241,28 +292,30 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ className }) => {
       {isSettingApiKey ? (
         <div className="border-t border-solo-secondary/20 p-4">
           <div className="space-y-2">
-            <p className="text-sm text-solo-secondary">Enter your Google Gemini API key:</p>
-            <div className="flex gap-2">
-              <Input
+            <p className="text-sm text-solo-secondary">Paste your Google Gemini API key:</p>
+            <div className="flex flex-col gap-2">
+              <Textarea
                 value={tempApiKey}
                 onChange={(e) => setTempApiKey(e.target.value)}
                 placeholder="API Key"
-                className="flex-1"
-                type="password"
+                className="min-h-[60px] font-mono text-sm"
               />
-              <Button 
-                onClick={handleSaveApiKey} 
-                disabled={!tempApiKey.trim()}
-                className="bg-solo-accent hover:bg-solo-accent/80"
-              >
-                Save
-              </Button>
-              <Button 
-                variant="ghost" 
-                onClick={() => setIsSettingApiKey(false)}
-              >
-                Cancel
-              </Button>
+              <div className="flex gap-2">
+                <Button 
+                  onClick={handleSaveApiKey} 
+                  disabled={!tempApiKey.trim() || isLoading}
+                  className="bg-solo-accent hover:bg-solo-accent/80 flex-1"
+                >
+                  {isLoading ? <Spinner size="sm" /> : 'Save & Verify Key'}
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  onClick={() => setIsSettingApiKey(false)}
+                  disabled={!apiKey}
+                >
+                  Cancel
+                </Button>
+              </div>
             </div>
             <p className="text-xs text-solo-secondary">
               Get your API key from 

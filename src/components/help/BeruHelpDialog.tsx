@@ -1,12 +1,13 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Key } from 'lucide-react';
-import { toast } from '@/components/ui/use-toast';
+import { useToast } from '@/components/ui/use-toast';
+import { Textarea } from '@/components/ui/textarea';
 
 interface BeruHelpDialogProps {
   open: boolean;
@@ -28,6 +29,15 @@ const BeruHelpDialog: React.FC<BeruHelpDialogProps> = ({ open, onClose }) => {
   const [apiKey, setApiKey] = useState<string | null>(localStorage.getItem('gemini_api_key') || '');
   const [tempApiKey, setTempApiKey] = useState('');
   const [activeTab, setActiveTab] = useState('categories');
+  const { toast } = useToast();
+  
+  // Effect to check API key on component load
+  useEffect(() => {
+    const savedKey = localStorage.getItem('gemini_api_key');
+    if (savedKey) {
+      setApiKey(savedKey);
+    }
+  }, []);
 
   const helpCategories: HelpCategory[] = [
     {
@@ -120,10 +130,54 @@ const BeruHelpDialog: React.FC<BeruHelpDialogProps> = ({ open, onClose }) => {
       localStorage.setItem('gemini_api_key', tempApiKey.trim());
       setApiKey(tempApiKey.trim());
       setTempApiKey('');
-      toast({
-        title: "API Key Saved",
-        description: "Your Gemini API key has been saved successfully."
+      
+      // Test the API key by making a simple request
+      testApiKey(tempApiKey.trim());
+    }
+  };
+  
+  const testApiKey = async (key: string) => {
+    try {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              role: "user",
+              parts: [{ text: "Hello, this is a test message. Please respond with 'API key working!' if you receive this." }]
+            }
+          ],
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 100,
+          }
+        }),
       });
+      
+      if (!response.ok) {
+        throw new Error(`API Error: ${response.status}`);
+      }
+      
+      toast({
+        title: "API Key Verified",
+        description: "Your Gemini API key has been verified and saved successfully.",
+        variant: "default",
+      });
+      
+    } catch (error) {
+      console.error("API Test Error:", error);
+      toast({
+        title: "API Key Error",
+        description: "There was an issue with the provided API key. Please check and try again.",
+        variant: "destructive",
+      });
+      
+      // Remove the invalid key
+      localStorage.removeItem('gemini_api_key');
+      setApiKey(null);
     }
   };
 
@@ -197,27 +251,26 @@ const BeruHelpDialog: React.FC<BeruHelpDialogProps> = ({ open, onClose }) => {
               </p>
               
               <div className="space-y-4">
-                <div className="flex gap-2">
-                  <Input
+                <div className="flex flex-col gap-2">
+                  <Textarea
                     value={tempApiKey}
                     onChange={(e) => setTempApiKey(e.target.value)}
-                    placeholder="Enter Gemini API Key"
-                    type="password"
-                    className="flex-1"
+                    placeholder="Paste your Gemini API Key here"
+                    className="min-h-[60px] font-mono text-sm"
                   />
                   <Button 
                     onClick={handleSaveApiKey} 
                     disabled={!tempApiKey.trim()}
-                    className="bg-solo-accent hover:bg-solo-accent/80"
+                    className="bg-solo-accent hover:bg-solo-accent/80 w-full"
                   >
-                    Save Key
+                    Save & Verify Key
                   </Button>
                 </div>
                 
                 {apiKey && (
                   <div className="text-sm text-green-500 flex items-center gap-1">
                     <Key size={16} />
-                    API Key is set
+                    API Key is set and ready to use
                   </div>
                 )}
                 
