@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
@@ -120,6 +119,10 @@ const BeruHelpDialog: React.FC<BeruHelpDialogProps> = ({ open, onClose }) => {
             {
               question: "What if I can't focus during meditation?",
               answer: "Even the mightiest Shadow Monarch may find their thoughts wandering initially, my Liege! This is not failure but part of the training. When you notice distraction, gently return focus to your breath or shadow visualization without self-criticism. Each return strengthens your mental discipline. Beginning with shorter sessions can build your capacity gradually. Some find focusing on a physical sensation, like the weight of your body or the coolness of breath, provides an anchor for attention."
+            },
+            {
+              question: "How should I sit during meditation?",
+              answer: "Your posture should reflect both comfort and dignity, my Liege! Many find the cross-legged position on a cushion most stable, though sitting on a chair with feet flat on the ground is equally effective. The essential elements are: spine straight but not rigid, shoulders relaxed, chin slightly tucked, and hands resting comfortably on thighs or in lap. As Shadow Monarch, you need not adhere strictly to mortal traditions - your power transcends form. Choose the position that allows longest comfortable alertness."
             }
           ]
         }
@@ -157,10 +160,9 @@ const BeruHelpDialog: React.FC<BeruHelpDialogProps> = ({ open, onClose }) => {
   ];
 
   useEffect(() => {
-    if (selectedQuestion && !isTyping) {
+    if (selectedQuestion && !selectedSubQuestion && !isTyping) {
       setAnimatedText('');
       setIsTyping(true);
-      setSelectedSubQuestion(null);
       
       // Animate the text appearing like typing
       let currentIndex = 0;
@@ -202,11 +204,16 @@ const BeruHelpDialog: React.FC<BeruHelpDialogProps> = ({ open, onClose }) => {
   }, [selectedSubQuestion]);
 
   const handleQuestionClick = (answer: string) => {
+    setSelectedSubQuestion(null); // Reset sub-question when selecting a new main question
     setSelectedQuestion(answer);
   };
   
   const handleSubQuestionClick = (answer: string) => {
     setSelectedSubQuestion(answer);
+  };
+
+  const handleBackToMainQuestion = () => {
+    setSelectedSubQuestion(null); // Clear the sub-question to show the main answer again
   };
 
   return (
@@ -216,6 +223,9 @@ const BeruHelpDialog: React.FC<BeruHelpDialogProps> = ({ open, onClose }) => {
           <DialogTitle className="flex items-center gap-2 text-xl">
             Beru's Help Scroll
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            Browse through categories and topics for Beru's guidance
+          </DialogDescription>
         </DialogHeader>
         
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -272,6 +282,16 @@ const BeruHelpDialog: React.FC<BeruHelpDialogProps> = ({ open, onClose }) => {
                       <div className="font-medium">
                         <p className="text-solo-accent mb-2">Beru says:</p>
                         <p>{animatedText}{isTyping && <span className="animate-pulse">|</span>}</p>
+                        
+                        {selectedSubQuestion && (
+                          <Button 
+                            variant="link" 
+                            className="mt-4 text-solo-accent/80 p-0"
+                            onClick={handleBackToMainQuestion}
+                          >
+                            Back to main answer
+                          </Button>
+                        )}
                       </div>
                     ) : (
                       <div className="text-solo-secondary text-center pt-10">

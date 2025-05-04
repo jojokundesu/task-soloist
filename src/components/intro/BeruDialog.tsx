@@ -119,10 +119,13 @@ const BeruDialog: React.FC<BeruDialogProps> = ({ onComplete, className }) => {
         if (heightUnit === 'feet') {
           const heightInCm = convertFeetInchesToCm(feet, inches);
           setUserData(prev => ({ ...prev, height: heightInCm }));
+          console.log("Setting height in cm:", heightInCm);
         } else {
           // Validate cm input
           if (isNaN(Number(userData.height)) || Number(userData.height) <= 0) return;
         }
+        setStep(prevStep => prevStep + 1); // Move to next step
+        return; // Important: return here to avoid the later setStep call
         break;
       case 4: // Weight
         if (isNaN(Number(userData.weight)) || Number(userData.weight) <= 0) return;
