@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -109,10 +108,12 @@ const BeruDialog: React.FC<BeruDialogProps> = ({ onComplete, className }) => {
     switch (step) {
       case 0: // Name
         if (!userData.name.trim()) return;
+        setStep(prevStep => prevStep + 1);
         break;
       case 1: // First age input
       case 2: // "Real" age
         if (isNaN(Number(userData.age)) || Number(userData.age) <= 0) return;
+        setStep(prevStep => prevStep + 1);
         break;
       case 3: // Height
         // Convert height if needed
@@ -124,17 +125,19 @@ const BeruDialog: React.FC<BeruDialogProps> = ({ onComplete, className }) => {
           // Validate cm input
           if (isNaN(Number(userData.height)) || Number(userData.height) <= 0) return;
         }
-        setStep(prevStep => prevStep + 1); // Move to next step
-        return; // Important: return here to avoid the later setStep call
-        break;
+        setStep(prevStep => prevStep + 1);
+        return;
       case 4: // Weight
         if (isNaN(Number(userData.weight)) || Number(userData.weight) <= 0) return;
+        setStep(prevStep => prevStep + 1);
         break;
       case 5: // Body fat percentage
         if (isNaN(Number(userData.bodyFatPercentage)) || Number(userData.bodyFatPercentage) < 0 || Number(userData.bodyFatPercentage) > 100) return;
+        setStep(prevStep => prevStep + 1);
         break;
       case 6: // Intelligence level
         if (isNaN(Number(userData.intelligenceLevel)) || Number(userData.intelligenceLevel) < 1 || Number(userData.intelligenceLevel) > 10) return;
+        setStep(prevStep => prevStep + 1);
         break;
       case 7: // Strength level
         if (isNaN(Number(userData.strengthLevel)) || Number(userData.strengthLevel) < 1 || Number(userData.strengthLevel) > 10) return;
@@ -145,9 +148,6 @@ const BeruDialog: React.FC<BeruDialogProps> = ({ onComplete, className }) => {
       default:
         break;
     }
-    
-    // Move to the next step
-    setStep(prevStep => prevStep + 1);
   };
   
   const generateBeruConclusion = () => {

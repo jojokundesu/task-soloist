@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -27,6 +28,7 @@ const BeruHelpDialog: React.FC<BeruHelpDialogProps> = ({ open, onClose }) => {
   const [animatedText, setAnimatedText] = useState<string>('');
   const [isTyping, setIsTyping] = useState(false);
   const [activeTab, setActiveTab] = useState('categories');
+  const typingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   
   const helpCategories: HelpCategory[] = [
     {
@@ -159,7 +161,22 @@ const BeruHelpDialog: React.FC<BeruHelpDialogProps> = ({ open, onClose }) => {
     }
   ];
 
+  // Clean up the typing animation when component unmounts or when changing questions
   useEffect(() => {
+    return () => {
+      if (typingIntervalRef.current) {
+        clearInterval(typingIntervalRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    // Clean up any existing animation
+    if (typingIntervalRef.current) {
+      clearInterval(typingIntervalRef.current);
+    }
+
+    // Only start animation if we have a question selected and we're not already typing
     if (selectedQuestion && !selectedSubQuestion && !isTyping) {
       setAnimatedText('');
       setIsTyping(true);
@@ -167,21 +184,28 @@ const BeruHelpDialog: React.FC<BeruHelpDialogProps> = ({ open, onClose }) => {
       // Animate the text appearing like typing
       let currentIndex = 0;
       const answer = selectedQuestion;
-      const typingInterval = setInterval(() => {
+      
+      typingIntervalRef.current = setInterval(() => {
         if (currentIndex <= answer.length) {
           setAnimatedText(answer.substring(0, currentIndex));
           currentIndex++;
         } else {
-          clearInterval(typingInterval);
+          if (typingIntervalRef.current) {
+            clearInterval(typingIntervalRef.current);
+          }
           setIsTyping(false);
         }
       }, 15); // Speed of typing
-      
-      return () => clearInterval(typingInterval);
     }
-  }, [selectedQuestion]);
+  }, [selectedQuestion, selectedSubQuestion]);
   
   useEffect(() => {
+    // Clean up any existing animation
+    if (typingIntervalRef.current) {
+      clearInterval(typingIntervalRef.current);
+    }
+
+    // Only start animation if we have a sub-question selected and we're not already typing
     if (selectedSubQuestion && !isTyping) {
       setAnimatedText('');
       setIsTyping(true);
@@ -189,31 +213,78 @@ const BeruHelpDialog: React.FC<BeruHelpDialogProps> = ({ open, onClose }) => {
       // Animate the text appearing like typing
       let currentIndex = 0;
       const answer = selectedSubQuestion;
-      const typingInterval = setInterval(() => {
+      
+      typingIntervalRef.current = setInterval(() => {
         if (currentIndex <= answer.length) {
           setAnimatedText(answer.substring(0, currentIndex));
           currentIndex++;
         } else {
-          clearInterval(typingInterval);
+          if (typingIntervalRef.current) {
+            clearInterval(typingIntervalRef.current);
+          }
           setIsTyping(false);
         }
       }, 15); // Speed of typing
-      
-      return () => clearInterval(typingInterval);
     }
   }, [selectedSubQuestion]);
 
+  // Reset animations when dialog closes
+  useEffect(() => {
+    if (!open) {
+      if (typingIntervalRef.current) {
+        clearInterval(typingIntervalRef.current);
+      }
+      setIsTyping(false);
+      setAnimatedText('');
+    }
+  }, [open]);
+
   const handleQuestionClick = (answer: string) => {
+    // Clean up any existing animation
+    if (typingIntervalRef.current) {
+      clearInterval(typingIntervalRef.current);
+      setIsTyping(false);
+    }
     setSelectedSubQuestion(null); // Reset sub-question when selecting a new main question
     setSelectedQuestion(answer);
   };
   
   const handleSubQuestionClick = (answer: string) => {
+    // Clean up any existing animation
+    if (typingIntervalRef.current) {
+      clearInterval(typingIntervalRef.current);
+      setIsTyping(false);
+    }
     setSelectedSubQuestion(answer);
   };
 
   const handleBackToMainQuestion = () => {
+    // Clean up any existing animation
+    if (typingIntervalRef.current) {
+      clearInterval(typingIntervalRef.current);
+      setIsTyping(false);
+    }
     setSelectedSubQuestion(null); // Clear the sub-question to show the main answer again
+    // Restart the main question animation
+    if (selectedQuestion) {
+      setAnimatedText('');
+      setIsTyping(true);
+      
+      let currentIndex = 0;
+      const answer = selectedQuestion;
+      
+      typingIntervalRef.current = setInterval(() => {
+        if (currentIndex <= answer.length) {
+          setAnimatedText(answer.substring(0, currentIndex));
+          currentIndex++;
+        } else {
+          if (typingIntervalRef.current) {
+            clearInterval(typingIntervalRef.current);
+          }
+          setIsTyping(false);
+        }
+      }, 15);
+    }
   };
 
   return (
