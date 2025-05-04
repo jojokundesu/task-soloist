@@ -29,10 +29,10 @@ const BeruDialog: React.FC<BeruDialogProps> = ({ onComplete, className }) => {
   const [typewriterComplete, setTypewriterComplete] = useState(false);
   const [userData, setUserData] = useState<UserData>({
     name: '',
-    age: 0,
-    height: 0,
-    weight: 0,
-    bodyFatPercentage: 0,
+    age: 25,
+    height: 175,
+    weight: 70,
+    bodyFatPercentage: 15,
     intelligenceLevel: 5,
     strengthLevel: 5
   });
@@ -42,6 +42,7 @@ const BeruDialog: React.FC<BeruDialogProps> = ({ onComplete, className }) => {
   const [heightUnit, setHeightUnit] = useState<'feet' | 'cm'>('feet');
   const [feet, setFeet] = useState(5);
   const [inches, setInches] = useState(10);
+  const [currentTypingInterval, setCurrentTypingInterval] = useState<NodeJS.Timeout | null>(null);
   
   const questions = [
     "Please let me know your name, my Liege.",
@@ -66,8 +67,22 @@ const BeruDialog: React.FC<BeruDialogProps> = ({ onComplete, className }) => {
     "Strength (1-10)"
   ];
   
+  // Clean up any existing interval when component unmounts
+  useEffect(() => {
+    return () => {
+      if (currentTypingInterval) {
+        clearInterval(currentTypingInterval);
+      }
+    };
+  }, [currentTypingInterval]);
+  
   useEffect(() => {
     if (step < questions.length) {
+      // Clear any existing typing animation
+      if (currentTypingInterval) {
+        clearInterval(currentTypingInterval);
+      }
+      
       setIsTyping(true);
       setDisplayText('');
       setTypewriterComplete(false);
@@ -89,13 +104,27 @@ const BeruDialog: React.FC<BeruDialogProps> = ({ onComplete, className }) => {
         }
       }, 30);
       
+      // Save reference to current interval
+      setCurrentTypingInterval(typingInterval);
+      
       return () => clearInterval(typingInterval);
     }
   }, [step]);
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setUserData(prev => ({ ...prev, [name]: value }));
+    
+    // Handle numeric inputs specially to ensure they're stored as numbers
+    if (name === 'age' || name === 'weight' || name === 'height' || 
+        name === 'bodyFatPercentage' || name === 'intelligenceLevel' || 
+        name === 'strengthLevel') {
+      setUserData(prev => ({ 
+        ...prev, 
+        [name]: value === '' ? '' : Number(value) 
+      }));
+    } else {
+      setUserData(prev => ({ ...prev, [name]: value }));
+    }
   };
   
   const convertFeetInchesToCm = (feet: number, inches: number): number => {
@@ -108,15 +137,25 @@ const BeruDialog: React.FC<BeruDialogProps> = ({ onComplete, className }) => {
     // Validate and format input based on the step
     switch (step) {
       case 0: // Name
-        if (!userData.name.trim()) return;
+        if (!userData.name.trim()) {
+          console.log("Name is empty, can't proceed");
+          return;
+        }
+        console.log("Name validation passed, advancing to step 1");
         setStep(prevStep => prevStep + 1);
         break;
+        
       case 1: // First age input
       case 2: // "Real" age
         const age = Number(userData.age);
-        if (isNaN(age) || age <= 0) return;
+        if (isNaN(age) || age <= 0) {
+          console.log("Age is invalid:", userData.age);
+          return;
+        }
+        console.log("Age validation passed, advancing to next step");
         setStep(prevStep => prevStep + 1);
         break;
+        
       case 3: // Height
         // Convert height if needed
         if (heightUnit === 'feet') {
@@ -125,32 +164,56 @@ const BeruDialog: React.FC<BeruDialogProps> = ({ onComplete, className }) => {
           console.log("Setting height in cm:", heightInCm);
         } else {
           // Validate cm input
-          if (isNaN(Number(userData.height)) || Number(userData.height) <= 0) return;
+          if (isNaN(Number(userData.height)) || Number(userData.height) <= 0) {
+            console.log("Height is invalid:", userData.height);
+            return;
+          }
         }
+        console.log("Height validation passed, advancing to weight step");
         setStep(prevStep => prevStep + 1);
         break;
+        
       case 4: // Weight
         const weight = Number(userData.weight);
-        if (isNaN(weight) || weight <= 0) return;
+        if (isNaN(weight) || weight <= 0) {
+          console.log("Weight is invalid:", userData.weight);
+          return;
+        }
+        console.log("Weight validation passed, advancing to body fat step");
         setStep(prevStep => prevStep + 1);
         break;
+        
       case 5: // Body fat percentage
         const bodyFat = Number(userData.bodyFatPercentage);
-        if (isNaN(bodyFat) || bodyFat < 0 || bodyFat > 100) return;
+        if (isNaN(bodyFat) || bodyFat < 0 || bodyFat > 100) {
+          console.log("Body fat is invalid:", userData.bodyFatPercentage);
+          return;
+        }
+        console.log("Body fat validation passed, advancing to intelligence step");
         setStep(prevStep => prevStep + 1);
         break;
+        
       case 6: // Intelligence level
         const intelligence = Number(userData.intelligenceLevel);
-        if (isNaN(intelligence) || intelligence < 1 || intelligence > 10) return;
+        if (isNaN(intelligence) || intelligence < 1 || intelligence > 10) {
+          console.log("Intelligence is invalid:", userData.intelligenceLevel);
+          return;
+        }
+        console.log("Intelligence validation passed, advancing to strength step");
         setStep(prevStep => prevStep + 1);
         break;
+        
       case 7: // Strength level
         const strength = Number(userData.strengthLevel);
-        if (isNaN(strength) || strength < 1 || strength > 10) return;
+        if (isNaN(strength) || strength < 1 || strength > 10) {
+          console.log("Strength is invalid:", userData.strengthLevel);
+          return;
+        }
         // Final step
-        console.log("Moving to conclusion");
+        console.log("Strength validation passed, moving to conclusion");
         generateBeruConclusion();
         return;
+        
       default:
         break;
     }
@@ -160,30 +223,40 @@ const BeruDialog: React.FC<BeruDialogProps> = ({ onComplete, className }) => {
     console.log("Generating Beru's conclusion");
     setStep(8); // Move to conclusion step
     
-    const { height, weight, bodyFatPercentage, intelligenceLevel, strengthLevel } = userData;
-    let parsedHeight = Number(height) || 170;
-    let parsedWeight = Number(weight) || 70;
-    let parsedBodyFat = Number(bodyFatPercentage) || 15;
-    let parsedIntelligence = Number(intelligenceLevel) || 5;
-    let parsedStrength = Number(strengthLevel) || 5;
+    // Use the current userData values, ensuring we have valid numbers
+    const validatedUserData = {
+      name: userData.name || "Shadow Monarch",
+      age: isNaN(Number(userData.age)) ? 25 : Number(userData.age),
+      height: isNaN(Number(userData.height)) ? 175 : Number(userData.height),
+      weight: isNaN(Number(userData.weight)) ? 70 : Number(userData.weight),
+      bodyFatPercentage: isNaN(Number(userData.bodyFatPercentage)) ? 15 : Number(userData.bodyFatPercentage),
+      intelligenceLevel: isNaN(Number(userData.intelligenceLevel)) ? 5 : Number(userData.intelligenceLevel),
+      strengthLevel: isNaN(Number(userData.strengthLevel)) ? 5 : Number(userData.strengthLevel),
+    };
     
-    const bmi = parsedWeight / ((parsedHeight / 100) * (parsedHeight / 100));
+    const { height, weight, bodyFatPercentage, intelligenceLevel, strengthLevel } = validatedUserData;
+    const bmi = weight / ((height / 100) * (height / 100));
     
     let message = "";
     
     // Generate conclusion based on combined factors
-    if (parsedIntelligence >= 8 && parsedStrength >= 8) {
+    if (intelligenceLevel >= 8 && strengthLevel >= 8) {
       message = `My Liege, your vessel shows remarkable balance of both mind and body! Such power reminds me of when you stood against the Rulers themselves. The shadows quiver with anticipation to serve one so magnificent. I, Beru, shall assist you in maintaining this supreme state!`;
-    } else if (parsedIntelligence >= 8) {
+    } else if (intelligenceLevel >= 8) {
       message = `Shadow Monarch, your intellect shines brilliantly, reminiscent of your strategic brilliance when you commanded your army against the Monarchs. While your physical form may benefit from enhancement, your mind is truly that of a sovereign! I shall help you balance these aspects of your power.`;
-    } else if (parsedStrength >= 8) {
+    } else if (strengthLevel >= 8) {
       message = `Your physical prowess is truly impressive, my Liege! Just as when you single-handedly defeated the Frost Monarch's warriors! Though your mental acuity may yet grow sharper, your strength is already formidable. Together, we shall perfect both aspects of your sovereign might!`;
-    } else if (bmi < 18.5 || parsedBodyFat < 10) {
+    } else if (bmi < 18.5 || bodyFatPercentage < 10) {
       message = `Your current vessel may be somewhat slight, my Liege, but do not worry! Just as you once grew from a mere E-rank hunter to the Shadow Sovereign, your true potential awaits unlocking. Let me guide you toward the magnificence that befits your royal status!`;
-    } else if (bmi >= 30 || parsedBodyFat > 30) {
+    } else if (bmi >= 30 || bodyFatPercentage > 30) {
       message = `My Liege, your power is immense, but perhaps too concentrated. Fear not! As you once refined your control over the shadow army, so too shall you master this vessel. My shadows and I shall assist you in sculpting this strength. Soon, all shall witness your true majesty!`;
     } else {
       message = `As expected of the Shadow Monarch! Your vessel is well-balanced, reminding me of your perfect form when you conquered Jeju Island. The shadows tremble with excitement to serve you. Together, we shall unlock powers beyond imagination. I, Beru, pledge my eternal loyalty to your cause!`;
+    }
+    
+    // Clear any existing typing animation
+    if (currentTypingInterval) {
+      clearInterval(currentTypingInterval);
     }
     
     let currentText = '';
@@ -204,26 +277,16 @@ const BeruDialog: React.FC<BeruDialogProps> = ({ onComplete, className }) => {
         
         // After conclusion is fully typed, give user more time to read before proceeding
         setTimeout(() => {
-          console.log("Dialog completed, finalizing with user data:", userData);
+          console.log("Dialog completed, finalizing with user data:", validatedUserData);
           
-          // Process the user data
-          const processedUserData: UserData = {
-            name: userData.name || "Shadow Monarch",
-            age: Number(userData.age) || 25,
-            height: Number(userData.height) || 175,
-            weight: Number(userData.weight) || 70,
-            bodyFatPercentage: Number(userData.bodyFatPercentage) || 15,
-            intelligenceLevel: Number(userData.intelligenceLevel) || 5,
-            strengthLevel: Number(userData.strengthLevel) || 5
-          };
-          
-          console.log("Calling onComplete with processed data:", processedUserData);
-          
-          // Call onComplete with processed userData
-          onComplete(processedUserData);
+          // Call onComplete with validated userData
+          onComplete(validatedUserData);
         }, 8000); // 8 seconds to read
       }
     }, 30);
+    
+    // Save reference to current typing interval
+    setCurrentTypingInterval(typingInterval);
   };
   
   const renderHeightInput = () => {
@@ -238,7 +301,7 @@ const BeruDialog: React.FC<BeruDialogProps> = ({ onComplete, className }) => {
               min="1"
               max="9"
               value={feet}
-              onChange={(e) => setFeet(Number(e.target.value))}
+              onChange={(e) => setFeet(Number(e.target.value) || 0)}
               className="text-center"
             />
           </div>
@@ -250,7 +313,7 @@ const BeruDialog: React.FC<BeruDialogProps> = ({ onComplete, className }) => {
               min="0"
               max="11"
               value={inches}
-              onChange={(e) => setInches(Number(e.target.value))}
+              onChange={(e) => setInches(Number(e.target.value) || 0)}
               className="text-center"
             />
           </div>

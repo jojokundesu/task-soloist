@@ -2,7 +2,6 @@
 import React from 'react';
 import NavBar from '@/components/navigation/nav-bar';
 import ChatInterface from '@/components/chat/ChatInterface';
-import BeruHelp from '@/components/help/BeruHelp';
 
 const Chat = () => {
   return (
@@ -18,7 +17,6 @@ const Chat = () => {
         <ChatInterface className="w-full" />
       </div>
       
-      <BeruHelp />
       <NavBar />
     </div>
   );

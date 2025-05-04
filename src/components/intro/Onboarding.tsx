@@ -24,6 +24,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
     
     // Wait for animation to complete before calling parent's onComplete
     setTimeout(() => {
+      console.log("Animation complete, calling onComplete");
       onComplete(userData);
     }, 500); // Match the exit animation duration
   };
