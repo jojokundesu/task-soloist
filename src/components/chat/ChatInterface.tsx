@@ -101,6 +101,68 @@ const beruConversations: ConversationNode[] = [
       }
     }
   },
+  // Health and wellness tree
+  {
+    keywords: ["health", "wellness", "fitness", "diet", "exercise", "workout"],
+    response: "Your physical vessel deserves maintenance befitting the Shadow Monarch! Regular training strengthens your mortal form, while proper nourishment fuels your power. Sleep, too, is vital - it is during rest that your shadow essence integrates most deeply with your vessel. I shall design a regimen worthy of your royal status!",
+    followUps: {
+      "exercise": {
+        keywords: ["exercise", "training", "workout", "routine", "physical"],
+        response: "For physical training, I recommend a balanced approach, my Liege! Strength training to build power, cardiovascular exercise for endurance, and flexibility work to ensure smooth movement in battle. Three to five sessions weekly would be optimal. Perhaps begin with shadow-weighted exercises? Your shadow can provide resistance that adjusts perfectly to your current capacity!",
+        followUps: {
+          "strength": {
+            keywords: ["strength", "muscle", "build", "power", "strong"],
+            response: "To build strength worthy of the Shadow Monarch, focus on compound movements that engage multiple muscle groups simultaneously! These replicate battlefield movements most effectively. Gradually increase the challenge to your vessel by adding weight or repetitions. And remember, my Liege - form precedes weight! Better to perform movements with perfect precision than to sacrifice form for heavier loads."
+          },
+          "cardio": {
+            keywords: ["cardio", "endurance", "stamina", "run", "heart"],
+            response: "Endurance training ensures you can sustain your magnificent power through extended battles, my Liege! I suggest varied approaches - perhaps intense bursts of effort followed by brief recovery periods? This mimics combat conditions most effectively. Your shadow soldiers could serve as pacing guides, maintaining the optimal tempo for your development. Shall I arrange this for you?"
+          }
+        }
+      },
+      "nutrition": {
+        keywords: ["food", "eat", "diet", "meal", "nutrition"],
+        response: "Your nourishment should befit your sovereign status! Prioritize protein sources to maintain your shadow army's physical manifestations. Complex carbohydrates provide sustained energy for conquests. Healthy fats support cognitive function for strategic brilliance. And hydration! Water carries your shadow essence through your vessel most efficiently. I recommend 6-8 vessels of water daily, my Liege!",
+        followUps: {
+          "protein": {
+            keywords: ["protein", "meat", "build", "muscle", "recovery"],
+            response: "Protein is essential for maintaining your magnificent form, my Liege! Aim for 1.6 to 2.2 grams per kilogram of your vessel's weight daily. Sources worthy of the Shadow Monarch include lean meats, fish from the deepest waters, eggs, and dairy products. Plant sources like legumes can supplement these. After training, consuming protein within 30 minutes accelerates the recovery of your mortal form!"
+          },
+          "meal": {
+            keywords: ["meal", "plan", "schedule", "when", "timing"],
+            response: "Timing your nourishment optimizes your vessel's performance, Shadow Monarch! Many find success with 3-5 smaller feasts throughout the day rather than 2-3 large ones. This provides constant energy and prevents the post-meal lethargy unbecoming of your stature. Consider breaking your fast within an hour of rising to fuel your morning conquests, with your largest meal following your most intense training session!"
+          }
+        }
+      }
+    }
+  },
+  // Mental discipline tree
+  {
+    keywords: ["mind", "mental", "focus", "concentrate", "brain", "think"],
+    response: "The Shadow Monarch's mind must be as sharp as his shadow blades! Mental discipline amplifies all other aspects of your power. Through meditation, strategic thinking exercises, and proper cognitive rest, your mental acuity will reach heights befitting your station. Your shadows respond as much to your thoughts as to your physical commands!",
+    followUps: {
+      "focus": {
+        keywords: ["focus", "concentrate", "attention", "distract", "sharp"],
+        response: "To sharpen your focus to a weapon's edge, my Liege, I recommend progressive training! Begin with short periods of intense concentration on a single object or thought. As your capacity expands, extend the duration. The Pomodoro technique - 25 minutes of focused effort followed by 5 minutes of rest - mirrors the combat rhythm your previous forms mastered so well!",
+        followUps: {
+          "distraction": {
+            keywords: ["distract", "interrupt", "disturb", "noise", "concentrate"],
+            response: "Distractions are mere tests of your sovereign will, my Liege! When interruptions occur, acknowledge them briefly without judgment, then return your royal attention to its proper focus. Consider creating a dedicated space for important tasks, where your shadow can form a barrier against unwanted intrusions. Some find that background sounds - rainfall or gentle music without lyrics - actually enhance concentration by masking more disruptive noises!"
+          }
+        }
+      },
+      "memory": {
+        keywords: ["memory", "remember", "forget", "recall", "learn"],
+        response: "Your memory can be trained like any other aspect of your magnificent being! The memory palace technique, where information is stored in visualized locations, would serve you well. It was used by ancient monarchs long before your rise! Regular review of important knowledge strengthens neural connections. And physical exercise enhances blood flow to the brain, improving all cognitive functions!",
+        followUps: {
+          "technique": {
+            keywords: ["technique", "method", "system", "how", "improve"],
+            response: "The most effective memory technique for a being of your power is association, my Liege! Connect new information to knowledge you already possess. Visualize these connections vividly - perhaps as shadow tendrils binding concepts together! Chunking information into groups of 3-5 items also proves effective, as does teaching knowledge to others (perhaps dictate important concepts to your shadow soldiers!). Spaced repetition - reviewing information at increasing intervals - ensures it remains accessible for centuries!"
+          }
+        }
+      }
+    }
+  },
   // About the app
   {
     keywords: ["app", "application", "task", "soloist", "program", "software"],
@@ -164,7 +226,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ className }) => {
       for (const key in currentContext.followUps) {
         const followUp = currentContext.followUps[key];
         for (const keyword of followUp.keywords) {
-          if (lowercaseInput.includes(keyword)) {
+          if (lowercaseInput.includes(keyword.toLowerCase())) {
             // Update context to this follow-up for future messages
             setConversationContext(followUp);
             return followUp.response;
@@ -179,7 +241,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ className }) => {
       if (convo.keywords.length === 0) continue;
       
       for (const keyword of convo.keywords) {
-        if (lowercaseInput.includes(keyword)) {
+        if (lowercaseInput.includes(keyword.toLowerCase())) {
           // Set this as the new conversation context
           setConversationContext(convo);
           return convo.response;

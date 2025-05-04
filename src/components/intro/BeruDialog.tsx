@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -112,7 +113,8 @@ const BeruDialog: React.FC<BeruDialogProps> = ({ onComplete, className }) => {
         break;
       case 1: // First age input
       case 2: // "Real" age
-        if (isNaN(Number(userData.age)) || Number(userData.age) <= 0) return;
+        const age = Number(userData.age);
+        if (isNaN(age) || age <= 0) return;
         setStep(prevStep => prevStep + 1);
         break;
       case 3: // Height
@@ -126,21 +128,25 @@ const BeruDialog: React.FC<BeruDialogProps> = ({ onComplete, className }) => {
           if (isNaN(Number(userData.height)) || Number(userData.height) <= 0) return;
         }
         setStep(prevStep => prevStep + 1);
-        return;
+        break;
       case 4: // Weight
-        if (isNaN(Number(userData.weight)) || Number(userData.weight) <= 0) return;
+        const weight = Number(userData.weight);
+        if (isNaN(weight) || weight <= 0) return;
         setStep(prevStep => prevStep + 1);
         break;
       case 5: // Body fat percentage
-        if (isNaN(Number(userData.bodyFatPercentage)) || Number(userData.bodyFatPercentage) < 0 || Number(userData.bodyFatPercentage) > 100) return;
+        const bodyFat = Number(userData.bodyFatPercentage);
+        if (isNaN(bodyFat) || bodyFat < 0 || bodyFat > 100) return;
         setStep(prevStep => prevStep + 1);
         break;
       case 6: // Intelligence level
-        if (isNaN(Number(userData.intelligenceLevel)) || Number(userData.intelligenceLevel) < 1 || Number(userData.intelligenceLevel) > 10) return;
+        const intelligence = Number(userData.intelligenceLevel);
+        if (isNaN(intelligence) || intelligence < 1 || intelligence > 10) return;
         setStep(prevStep => prevStep + 1);
         break;
       case 7: // Strength level
-        if (isNaN(Number(userData.strengthLevel)) || Number(userData.strengthLevel) < 1 || Number(userData.strengthLevel) > 10) return;
+        const strength = Number(userData.strengthLevel);
+        if (isNaN(strength) || strength < 1 || strength > 10) return;
         // Final step
         console.log("Moving to conclusion");
         generateBeruConclusion();
