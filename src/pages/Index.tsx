@@ -59,7 +59,9 @@ const Index = () => {
       age: Number(userData?.age) || 25,
       height: Number(userData?.height) || 175,
       weight: Number(userData?.weight) || 70,
-      bodyFatPercentage: Number(userData?.bodyFatPercentage) || 15
+      bodyFatPercentage: Number(userData?.bodyFatPercentage) || 15,
+      intelligenceLevel: Number(userData?.intelligenceLevel) || 5,
+      strengthLevel: Number(userData?.strengthLevel) || 5
     };
     
     console.log("Validated user data:", validatedUserData);
@@ -69,7 +71,8 @@ const Index = () => {
       name: validatedUserData.name,
       stats: {
         ...defaultUser.stats,
-        strength: validatedUserData.bodyFatPercentage < 15 ? 8 : 10,
+        strength: Math.max(7, Math.min(12, validatedUserData.strengthLevel + 5)), // Scale 1-10 to 7-15
+        intelligence: Math.max(7, Math.min(12, validatedUserData.intelligenceLevel + 5)),
         endurance: validatedUserData.bodyFatPercentage > 25 ? 8 : 10,
       }
     };

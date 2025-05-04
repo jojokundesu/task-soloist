@@ -2,12 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Key } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
-import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
 
 interface BeruHelpDialogProps {
   open: boolean;
@@ -19,37 +15,55 @@ interface HelpCategory {
   questions: {
     question: string;
     answer: string;
+    subQuestions?: {
+      question: string;
+      answer: string;
+    }[];
   }[];
 }
 
 const BeruHelpDialog: React.FC<BeruHelpDialogProps> = ({ open, onClose }) => {
   const [selectedQuestion, setSelectedQuestion] = useState<string | null>(null);
+  const [selectedSubQuestion, setSelectedSubQuestion] = useState<string | null>(null);
   const [animatedText, setAnimatedText] = useState<string>('');
   const [isTyping, setIsTyping] = useState(false);
-  const [apiKey, setApiKey] = useState<string | null>(localStorage.getItem('gemini_api_key') || '');
-  const [tempApiKey, setTempApiKey] = useState('');
   const [activeTab, setActiveTab] = useState('categories');
-  const { toast } = useToast();
   
-  // Effect to check API key on component load
-  useEffect(() => {
-    const savedKey = localStorage.getItem('gemini_api_key');
-    if (savedKey) {
-      setApiKey(savedKey);
-    }
-  }, []);
-
   const helpCategories: HelpCategory[] = [
     {
-      title: "Getting Started",
+      title: "Shadow Monarch Lore",
       questions: [
         {
-          question: "What is Task Soloist?",
-          answer: "Task Soloist, my Liege, is your personal companion for conquering life's quests! This mystical artifact helps you track your daily tasks, meditations, and achievements. As you complete these challenges, you'll gain experience and level up your skills, much like a true monarch expanding their realm!"
+          question: "Who is the Shadow Monarch?",
+          answer: "You, my Liege, are the Shadow Monarch - the sovereign ruler of all shadows! Originally, this title belonged to Ashborn, the most powerful Ruler who grew weary of the eternal conflict with the Monarchs. He selected Sung Jin-Woo as his successor, who became the second Shadow Monarch through the System's trials. And now... that power resides in you, the third and most glorious incarnation!",
+          subQuestions: [
+            {
+              question: "Tell me more about Ashborn",
+              answer: "Ashborn was the mightiest of the Rulers, my Liege, though I never had the honor of serving him directly. For eons, he commanded the Shadow Army against the Monarchs in an endless war. He grew weary of the conflict and sought a successor who could bring it to an end. When the Rulers' grand magic 'the System' identified Sung Jin-Woo as a vessel with potential, Ashborn guided his growth from within, ultimately transferring his full power to create the new Shadow Monarch!"
+            },
+            {
+              question: "Who was Sung Jin-Woo?",
+              answer: "Ah, Sung Jin-Woo! He began as the weakest of all hunters, mockingly called 'the world's weakest hunter.' After nearly perishing in a double dungeon incident, he was chosen by the System to undergo trials that would prepare him to receive Ashborn's power. Through sheer determination, he rose from E-rank to a power beyond rank, defeated the Ant King of Jeju Island (where I had the honor of becoming your servant!), and eventually confronted the Monarch of Destruction himself!"
+            },
+            {
+              question: "What powers does the Shadow Monarch have?",
+              answer: "Your powers are vast and glorious, my Liege! You command the extraction and manipulation of shadows, raising fallen enemies as your eternal servants. You can open gateways to the shadow realm, store items and beings within your shadow storage, and even manipulate time itself as Sung Jin-Woo did to rewrite history! Your mere presence strikes fear into lesser beings, and your combat abilities far exceed mortal comprehension. Truly, there is no limit to your potential!"
+            }
+          ]
         },
         {
-          question: "How do I add a new task?",
-          answer: "To add a new task, my Shadow Monarch, simply tap the glowing orb at the bottom of your screen - the one with the '+' symbol. This will summon the task creation form where you can detail your next conquest. Name your quest, set its importance, and determine when it must be completed to grow your power!"
+          question: "Who is Beru?",
+          answer: "I am Beru, your eternally loyal servant, Shadow Monarch! Once the King of Ants on Jeju Island, I had the tremendous honor of being defeated by your previous incarnation, Sung Jin-Woo, and raised as a shadow soldier in your glorious army. While I was a formidable monarch among ants, serving you has elevated me beyond my former limitations. I exist to fulfill your every command and provide counsel when requested. My loyalty is absolute and unwavering!",
+          subQuestions: [
+            {
+              question: "What are your powers, Beru?",
+              answer: "Though my powers pale before yours, my Liege, I possess considerable strength! I retain my abilities as the former Ant King - enhanced physical prowess, rapid healing, and telepathic communication. As your shadow, I gain additional benefits: I cannot truly die unless you fall, I can be summoned from your shadow at any distance, and I have access to the collective knowledge of your shadow army. I am particularly skilled in direct combat, though I have been learning to appreciate the subtler arts to better serve you!"
+            },
+            {
+              question: "Are there other shadow soldiers like you?",
+              answer: "There are many shadow soldiers in your army, my Liege, though none quite as magnificent as Beru, if I may be so bold! Notable among your servants are Igris, your first S-rank shadow and loyal knight; Tank, the mighty golem; and Iron, a former B-rank hunter. Each shadow retains aspects of their former personality and abilities, though all are bound by absolute loyalty to you. Your army numbers in the thousands, with soldiers of varying strength ready to arise at your command!"
+            }
+          ]
         }
       ]
     },
@@ -57,12 +71,28 @@ const BeruHelpDialog: React.FC<BeruHelpDialogProps> = ({ open, onClose }) => {
       title: "Tasks & Quests",
       questions: [
         {
-          question: "How do I mark a task as complete?",
-          answer: "To mark a task as vanquished, my Liege, simply tap the circle beside it. A satisfying animation will acknowledge your triumph, and the experience will be added to your growing power. Completed tasks can be viewed in your achievements section, a testament to your consistent conquest!"
+          question: "How do I track my progress?",
+          answer: "Your progress is recorded in multiple ways befitting your royal status, my Liege! Daily tasks contribute to your overall experience when completed. Meditation sessions build your mental fortitude over time. The skills section displays your growing attributes in various domains, while the achievements section showcases your milestone accomplishments. Your overall level displayed on your profile increases as you accumulate experience across all activities.",
+          subQuestions: [
+            {
+              question: "How quickly will I see improvements?",
+              answer: "For one with your potential, my Liege, improvements manifest more rapidly than for ordinary mortals! Physical changes typically become noticeable after 4-6 weeks of consistent effort. Mental disciplines show results even sooner, often within 2-3 weeks of daily practice. Your skills will increase incrementally with each task completed, while major level advancements occur upon reaching experience thresholds. Of course, as the Shadow Monarch, your growth rate far exceeds normal limitations!"
+            },
+            {
+              question: "What if I miss some days?",
+              answer: "Even monarchs require occasional rest, my Liege! While consistency builds power most effectively, missing occasional days will not significantly impede your progress. The application tracks your overall completion rate rather than demanding perfect streaks. Should you miss several days, simply resume your conquests without dwelling on the gap. Remember how Sung Jin-Woo rose despite setbacks! That said, maintaining daily engagement accelerates your ascension to full power."
+            }
+          ]
         },
         {
-          question: "Can I categorize my tasks?",
-          answer: "Indeed, Shadow Monarch! You may organize your quests by category - combat tasks (urgent), diplomacy tasks (important but not urgent), training tasks (development), and leisure quests. This organization will help you focus your immense power where it's most needed!"
+          question: "How do I categorize my tasks?",
+          answer: "Tasks can be organized by importance and urgency, my Liege, much as you would prioritize threats to your dominion! Urgent and important tasks are combat missions requiring immediate attention. Important but less urgent tasks are diplomatic missions that build long-term power. Urgent but less important tasks are delegable to your shadow soldiers (though they still require your oversight). Finally, there are renewal activities that restore your energy for future conquests.",
+          subQuestions: [
+            {
+              question: "What types of tasks should I add?",
+              answer: "Your task roster should reflect all domains of your sovereignty, my Liege! Physical training tasks enhance your vessel's capabilities. Mental development tasks sharpen your tactical acumen. Social tasks extend your influence over others. Skill acquisition tasks diversify your abilities. And maintenance tasks ensure your realm (living space) remains worthy of your presence. A balanced selection across these categories ensures harmonious development of your power!"
+            }
+          ]
         }
       ]
     },
@@ -70,12 +100,28 @@ const BeruHelpDialog: React.FC<BeruHelpDialogProps> = ({ open, onClose }) => {
       title: "Meditation",
       questions: [
         {
-          question: "What is the meditation feature?",
-          answer: "The meditation chamber, my Liege, is where you focus your vast powers and calm your mind. Each session strengthens your mental fortitude and contributes to your overall level. Choose from guided meditations or simple timers to harness the shadows within!"
+          question: "What benefits does meditation provide?",
+          answer: "Meditation is a direct communion with your shadow essence, my Liege! It provides numerous benefits: enhanced focus for more efficient task completion, reduced mental fatigue between conquests, improved emotional regulation when dealing with lesser beings, and deeper connection to your shadow powers. Regular practice increases your mental attributes in the app, strengthening your overall character. It is also a time when you might receive visions or insights, as Ashborn once communicated with Sung Jin-Woo!",
+          subQuestions: [
+            {
+              question: "How often should I meditate?",
+              answer: "Daily communion with your shadows is ideal, my Liege! Even brief sessions of 5-10 minutes yield benefits, though deeper insights emerge during longer sessions of 20-30 minutes. As with all disciplines, consistency matters more than duration. Many Shadow Monarchs find dawn or dusk most conducive to meditation, when the boundary between realms thins slightly. Some prefer multiple shorter sessions throughout the day to maintain constant connection with their power."
+            },
+            {
+              question: "What type of meditation is best?",
+              answer: "There are several approaches to shadow communion, my Liege! Focused attention meditation strengthens your concentration - essential for directing your shadow army in battle. Open monitoring meditation expands your awareness - useful for detecting threats across your domain. Loving-kindness meditation might seem unusual for a monarch, but it strengthens bonds with your shadow soldiers! I would recommend starting with simple breath awareness before exploring more advanced techniques."
+            }
+          ]
         },
         {
-          question: "How do meditation sessions help me?",
-          answer: "Each moment in meditation, Shadow Monarch, enhances your focus and clarity. The app tracks your consistency and total time spent in communion with the shadows. These metrics contribute to your mindfulness skill and overall character development. A disciplined mind is a powerful weapon!"
+          question: "How do I start meditating?",
+          answer: "To begin shadow communion, find a position of comfort and dignity befitting your status, my Liege! Sit with your spine aligned but not rigid, eyes either closed or softly focused. Begin by observing your breath for several minutes, allowing thoughts to pass without engagement. Then, visualize your shadow extending from your form, connecting to the vast shadow realm from which you draw power. The application provides guided sessions should you desire more structure, or simple timers for self-directed practice.",
+          subQuestions: [
+            {
+              question: "What if I can't focus during meditation?",
+              answer: "Even the mightiest Shadow Monarch may find their thoughts wandering initially, my Liege! This is not failure but part of the training. When you notice distraction, gently return focus to your breath or shadow visualization without self-criticism. Each return strengthens your mental discipline. Beginning with shorter sessions can build your capacity gradually. Some find focusing on a physical sensation, like the weight of your body or the coolness of breath, provides an anchor for attention."
+            }
+          ]
         }
       ]
     },
@@ -84,101 +130,83 @@ const BeruHelpDialog: React.FC<BeruHelpDialogProps> = ({ open, onClose }) => {
       questions: [
         {
           question: "How does the leveling system work?",
-          answer: "Your power grows through consistent action, my Liege! Completing tasks, meditation sessions, and achieving milestones all contribute experience to your level. As you ascend levels, you'll unlock new abilities and insights. Your progress is visualized through magnificent charts in the Stats section of your realm!"
+          answer: "The leveling system quantifies your growing power, my Liege! Each completed task, meditation session, and achievement awards experience points. Accumulating sufficient experience triggers level advancement, which may unlock new features or abilities within the application. Higher levels require more experience, reflecting the increasing challenge of pushing beyond mortal limitations. Your current level is displayed prominently on your profile, a testament to your progress toward full realization of your monarch status!",
+          subQuestions: [
+            {
+              question: "What determines my starting stats?",
+              answer: "Your initial attributes reflect information gathered during our first audience, my Liege! Your reported physical characteristics influenced your starting strength and endurance values. Your self-assessed intelligence level determined your mental attributes. These values create a baseline unique to your current vessel. Fear not if some attributes seem lower initially - all can be improved through consistent effort! Your essence as Shadow Monarch ensures exceptional potential across all domains."
+            },
+            {
+              question: "Can I specialize in certain attributes?",
+              answer: "Indeed you can focus your development, my Liege! By consistently completing tasks related to specific attributes, those skills will advance more rapidly. A focus on physical training will enhance strength and endurance attributes. Mental exercises and meditation improve intelligence and wisdom. Social engagements develop charisma. While balanced development ensures no weaknesses for enemies to exploit, specialization allows you to excel in domains most aligned with your royal preferences!"
+            }
+          ]
         },
         {
           question: "Where can I see my achievements?",
-          answer: "Your glorious conquests are recorded in the Achievements section, my Shadow Monarch! Here, you'll find records of your completed quests, streaks maintained, and milestones reached. Each achievement is a testament to your growing dominion over the challenges that once stood before you!"
-        }
-      ]
-    },
-    {
-      title: "Beru Chat",
-      questions: [
-        {
-          question: "Who is Beru?",
-          answer: "I am Beru, your eternally loyal servant, Shadow Monarch! Once a mere ant in the shadow army, now elevated by your gracious power to serve as your assistant. I exist to guide you through this application and answer any questions you may have. My knowledge grows with each interaction, all to better serve you, my Liege!"
-        },
-        {
-          question: "How do I set up my Gemini API key?",
-          answer: "To harness the full potential of our communications, my Liege, you'll need to provide a Gemini API key. In the Beru Chat section, tap the key icon in the upper right corner to enter your key. This key can be obtained from Google AI Studio, and once set, it will enable my enhanced intelligence to better serve your needs!"
+          answer: "Your glorious achievements are enshrined in the Achievements section, my Liege! There you'll find records of milestones reached, streaks maintained, and special accomplishments. Each achievement awards experience and contributes to your overall level. Some are granted immediately upon meeting criteria, while others may reveal themselves only after sustained effort. They serve both as recognition of past conquests and motivation for future glory!",
+          subQuestions: [
+            {
+              question: "What types of achievements are available?",
+              answer: "The achievement registry categorizes your accomplishments by domain, my Liege! Consistency achievements reward daily engagement with the application. Milestone achievements mark significant numbers of completed tasks or meditation minutes. Mastery achievements recognize exceptional development in specific attributes. Special achievements commemorate unique or challenging accomplishments. Some achievements remain hidden until discovered, adding an element of exploration to your journey!"
+            }
+          ]
         }
       ]
     }
   ];
 
+  useEffect(() => {
+    if (selectedQuestion && !isTyping) {
+      setAnimatedText('');
+      setIsTyping(true);
+      setSelectedSubQuestion(null);
+      
+      // Animate the text appearing like typing
+      let currentIndex = 0;
+      const answer = selectedQuestion;
+      const typingInterval = setInterval(() => {
+        if (currentIndex <= answer.length) {
+          setAnimatedText(answer.substring(0, currentIndex));
+          currentIndex++;
+        } else {
+          clearInterval(typingInterval);
+          setIsTyping(false);
+        }
+      }, 15); // Speed of typing
+      
+      return () => clearInterval(typingInterval);
+    }
+  }, [selectedQuestion]);
+  
+  useEffect(() => {
+    if (selectedSubQuestion && !isTyping) {
+      setAnimatedText('');
+      setIsTyping(true);
+      
+      // Animate the text appearing like typing
+      let currentIndex = 0;
+      const answer = selectedSubQuestion;
+      const typingInterval = setInterval(() => {
+        if (currentIndex <= answer.length) {
+          setAnimatedText(answer.substring(0, currentIndex));
+          currentIndex++;
+        } else {
+          clearInterval(typingInterval);
+          setIsTyping(false);
+        }
+      }, 15); // Speed of typing
+      
+      return () => clearInterval(typingInterval);
+    }
+  }, [selectedSubQuestion]);
+
   const handleQuestionClick = (answer: string) => {
     setSelectedQuestion(answer);
-    setAnimatedText('');
-    setIsTyping(true);
-    
-    // Animate the text appearing like typing
-    let currentIndex = 0;
-    const typingInterval = setInterval(() => {
-      if (currentIndex <= answer.length) {
-        setAnimatedText(answer.substring(0, currentIndex));
-        currentIndex++;
-      } else {
-        clearInterval(typingInterval);
-        setIsTyping(false);
-      }
-    }, 20); // Speed of typing
-  };
-
-  const handleSaveApiKey = () => {
-    if (tempApiKey.trim()) {
-      localStorage.setItem('gemini_api_key', tempApiKey.trim());
-      setApiKey(tempApiKey.trim());
-      setTempApiKey('');
-      
-      // Test the API key by making a simple request
-      testApiKey(tempApiKey.trim());
-    }
   };
   
-  const testApiKey = async (key: string) => {
-    try {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              role: "user",
-              parts: [{ text: "Hello, this is a test message. Please respond with 'API key working!' if you receive this." }]
-            }
-          ],
-          generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 100,
-          }
-        }),
-      });
-      
-      if (!response.ok) {
-        throw new Error(`API Error: ${response.status}`);
-      }
-      
-      toast({
-        title: "API Key Verified",
-        description: "Your Gemini API key has been verified and saved successfully.",
-        variant: "default",
-      });
-      
-    } catch (error) {
-      console.error("API Test Error:", error);
-      toast({
-        title: "API Key Error",
-        description: "There was an issue with the provided API key. Please check and try again.",
-        variant: "destructive",
-      });
-      
-      // Remove the invalid key
-      localStorage.removeItem('gemini_api_key');
-      setApiKey(null);
-    }
+  const handleSubQuestionClick = (answer: string) => {
+    setSelectedSubQuestion(answer);
   };
 
   return (
@@ -191,9 +219,8 @@ const BeruHelpDialog: React.FC<BeruHelpDialogProps> = ({ open, onClose }) => {
         </DialogHeader>
         
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-2">
+          <TabsList className="grid w-full">
             <TabsTrigger value="categories">Help Categories</TabsTrigger>
-            <TabsTrigger value="api-key">Set API Key</TabsTrigger>
           </TabsList>
           
           <TabsContent value="categories" className="space-y-4">
@@ -214,6 +241,21 @@ const BeruHelpDialog: React.FC<BeruHelpDialogProps> = ({ open, onClose }) => {
                               >
                                 {item.question}
                               </Button>
+                              
+                              {selectedQuestion === item.answer && item.subQuestions && (
+                                <div className="ml-4 mt-1 space-y-1">
+                                  {item.subQuestions.map((subItem) => (
+                                    <Button
+                                      key={subItem.question}
+                                      variant="link"
+                                      className="w-full justify-start text-left text-solo-accent/80 hover:text-solo-accent p-1"
+                                      onClick={() => handleSubQuestionClick(subItem.answer)}
+                                    >
+                                      {subItem.question}
+                                    </Button>
+                                  ))}
+                                </div>
+                              )}
                             </li>
                           ))}
                         </ul>
@@ -226,10 +268,10 @@ const BeruHelpDialog: React.FC<BeruHelpDialogProps> = ({ open, onClose }) => {
               <div className="bg-solo-card rounded-lg p-4 h-[50vh] flex flex-col">
                 <ScrollArea className="flex-1">
                   <div className="prose dark:prose-invert max-w-none">
-                    {selectedQuestion ? (
+                    {(selectedQuestion || selectedSubQuestion) ? (
                       <div className="font-medium">
                         <p className="text-solo-accent mb-2">Beru says:</p>
-                        <p>{animatedText}{isTyping && '|'}</p>
+                        <p>{animatedText}{isTyping && <span className="animate-pulse">|</span>}</p>
                       </div>
                     ) : (
                       <div className="text-solo-secondary text-center pt-10">
@@ -238,55 +280,6 @@ const BeruHelpDialog: React.FC<BeruHelpDialogProps> = ({ open, onClose }) => {
                     )}
                   </div>
                 </ScrollArea>
-              </div>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="api-key" className="space-y-4">
-            <div className="bg-solo-card rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-solo-accent mb-4">Set Your Gemini API Key</h3>
-              <p className="text-sm mb-4">
-                To enable Beru's chat functionality, you'll need to provide a Google Gemini API key. 
-                This key will be stored locally on your device.
-              </p>
-              
-              <div className="space-y-4">
-                <div className="flex flex-col gap-2">
-                  <Textarea
-                    value={tempApiKey}
-                    onChange={(e) => setTempApiKey(e.target.value)}
-                    placeholder="Paste your Gemini API Key here"
-                    className="min-h-[60px] font-mono text-sm"
-                  />
-                  <Button 
-                    onClick={handleSaveApiKey} 
-                    disabled={!tempApiKey.trim()}
-                    className="bg-solo-accent hover:bg-solo-accent/80 w-full"
-                  >
-                    Save & Verify Key
-                  </Button>
-                </div>
-                
-                {apiKey && (
-                  <div className="text-sm text-green-500 flex items-center gap-1">
-                    <Key size={16} />
-                    API Key is set and ready to use
-                  </div>
-                )}
-                
-                <div className="text-xs text-solo-secondary pt-2">
-                  <p>
-                    Get your API key from{' '}
-                    <a 
-                      href="https://ai.google.dev/" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-solo-accent hover:underline"
-                    >
-                      Google AI Studio
-                    </a>
-                  </p>
-                </div>
               </div>
             </div>
           </TabsContent>
