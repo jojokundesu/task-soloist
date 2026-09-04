@@ -1,82 +1,67 @@
+# Task Soloist — Installation Guide
 
-# Task Soloist Installation Guide for Android
+Task Soloist is a **fully offline full-stack app**. After install, it needs no internet.
 
-This guide will help you install the Task Soloist app on your Android device, even if you're not tech-savvy.
+## Web (desktop / laptop)
 
-## Option 1: Direct APK Installation (Easiest)
+### Requirements
+- Node.js 18+ (LTS recommended)
+- npm 9+
 
-1. **Download the APK file**
-   - Click on the APK file that was shared with you
-   - If prompted, tap "Download" to save it to your device
+### Run in development
 
-2. **Install the APK**
-   - Tap on the downloaded APK file
-   - If prompted about security settings, tap "Settings"
-   - Enable "Install from Unknown Sources" or "Install Unknown Apps" for your browser or file manager
-   - Go back and tap the APK file again
-   - Tap "Install"
-   - Wait for the installation to complete
-   - Tap "Open" to start the app
+```bash
+npm install
+npm run dev
+```
 
-## Option 2: Build It Yourself (More Advanced)
+This starts:
+- **API + SQLite** on port `3001`
+- **Vite frontend** on port `8080` (proxies `/api` locally)
 
-If you want to build the app yourself:
+Open the Vite URL in your browser.
 
-1. **Set up your computer**
-   - Install [Node.js](https://nodejs.org/en/download/) (select the LTS version)
-   - Install [Android Studio](https://developer.android.com/studio)
-   - During Android Studio installation, make sure to install:
-     - Android SDK
-     - Android SDK Platform
-     - Android Virtual Device
+### Production (single server)
 
-2. **Get the code**
-   - Download the project files (zip file)
-   - Extract the zip file to a folder
+```bash
+npm install
+npm run build
+npm start
+```
 
-3. **Open Command Prompt or Terminal**
-   - Navigate to the extracted project folder
-   - Type these commands one at a time and press Enter after each:
-     ```
-     npm install
-     npm run build
-     npx cap add android
-     npx cap sync
-     ```
+Visit `http://localhost:3001` — Express serves both the API and the built UI.
 
-4. **Build the APK**
-   - Type this command and press Enter:
-     ```
-     npx cap open android
-     ```
-   - Android Studio will open
-   - In Android Studio, click "Build" from the top menu
-   - Select "Build Bundle(s) / APK(s)"
-   - Click "Build APK(s)"
-   - Wait for the build to complete
+## Android (Capacitor)
 
-5. **Install on your phone**
-   - Connect your Android phone to your computer with a USB cable
-   - Make sure USB debugging is enabled on your phone (in Developer options)
-   - In Android Studio, click "Run" from the top menu
-   - Select "Run 'app'"
-   - Select your connected device
-   - The app will install and run on your phone
+1. `npm install && npm run build`
+2. `npx cap add android` (first time)
+3. `npx cap sync`
+4. `npx cap open android` → Build APK in Android Studio
 
-## About Permissions
+The app stores data on-device. Pair with the local Node server for full API features when developing; packaged builds can embed or point at a local backend.
 
-Task Soloist respects your privacy:
-- It only stores data on your device's local storage
-- It doesn't require any special permissions
-- Your data stays on your device unless you choose to use the optional Google account backup feature
-- Google account backup is completely optional and the app works 100% offline without it
+## Data location
+
+| Item | Path |
+|------|------|
+| SQLite DB | `data/task-soloist.db` |
+| JSON backups | Exported from **Profile → Local Backup** |
+
+## Privacy
+
+- No cloud accounts
+- No Google / Supabase / OpenAI calls
+- No external fonts or analytics CDNs
+- Beru chat runs as a local conversation engine
+- Optional JSON export stays on your machine
 
 ## Troubleshooting
 
-If you have any issues:
-- Make sure your Android version is 6.0 or newer
-- Check that you have enough storage space on your device
-- If installing from APK, make sure you allowed installation from unknown sources
-- Try restarting your device and trying again
+| Issue | Fix |
+|-------|-----|
+| “Local server unreachable” | Run `npm run dev` (both processes) |
+| Port in use | Set `PORT=3002` for API; update Vite proxy if needed |
+| Corrupt data | Profile → Reset, or delete `data/*.db*` |
+| blank screen offline | Ensure service worker registered after first online load of assets |
 
-Enjoy using Task Soloist to level up your life!
+Enjoy leveling up, hunter.

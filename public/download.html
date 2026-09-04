@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Download Task Soloist APK</title>
+  <style>
+    :root { color-scheme: dark; }
+    body {
+      margin: 0; min-height: 100vh; display: grid; place-items: center;
+      font-family: system-ui, sans-serif;
+      background: radial-gradient(ellipse at 20% 0%, rgba(139,92,246,.25), transparent 50%),
+                  linear-gradient(180deg, #0b0d14, #121318 60%);
+      color: #f2f2f2; padding: 24px;
+    }
+    .card {
+      max-width: 420px; width: 100%;
+      background: rgba(0,0,0,.35); border: 1px solid rgba(139,92,246,.35);
+      border-radius: 16px; padding: 28px; backdrop-filter: blur(12px);
+      box-shadow: 0 20px 60px rgba(0,0,0,.45);
+    }
+    h1 {
+      margin: 0 0 8px;
+      background: linear-gradient(90deg, #a78bfa, #e879f9);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      font-size: 1.6rem;
+    }
+    p { color: #b0b0c0; line-height: 1.5; font-size: .95rem; }
+    .btn {
+      display: block; text-align: center; margin-top: 18px;
+      padding: 14px 18px; border-radius: 12px; font-weight: 700;
+      text-decoration: none; color: white;
+      background: linear-gradient(90deg, #8B5CF6, #D946EF);
+      box-shadow: 0 8px 24px rgba(139,92,246,.35);
+    }
+    .btn.secondary {
+      background: transparent; border: 1px solid rgba(255,255,255,.15); color: #ddd;
+      box-shadow: none; margin-top: 10px; font-weight: 600;
+    }
+    ol { color: #c9c9d4; padding-left: 1.2rem; line-height: 1.6; font-size: .9rem; }
+    .badge {
+      display: inline-block; font-size: .7rem; letter-spacing: .06em; text-transform: uppercase;
+      padding: 4px 8px; border-radius: 999px; background: rgba(34,197,94,.15); color: #86efac;
+      margin-bottom: 12px;
+    }
+    code { background: rgba(255,255,255,.08); padding: 2px 6px; border-radius: 4px; font-size: .85em; }
+    #status { font-size: .85rem; color: #a78bfa; margin-top: 12px; min-height: 1.2em; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="badge">Android · Fully Offline</div>
+    <h1>Task Soloist APK</h1>
+    <p>
+      Solo Leveling–inspired productivity RPG. Install on your phone — no account, no internet after install.
+      All progress stays on your device.
+    </p>
+
+    <a class="btn" id="primary-download" href="#">Download TaskSoloist.apk</a>
+    <a class="btn secondary" id="releases-link" href="#" target="_blank" rel="noopener">Open GitHub Releases</a>
+    <a class="btn secondary" href="/">Open Web App</a>
+
+    <p id="status">Looking up latest release…</p>
+
+    <h3 style="margin-top:22px;font-size:1rem;">Install steps</h3>
+    <ol>
+      <li>Tap <strong>Download TaskSoloist.apk</strong></li>
+      <li>Open the file (notification or Files app)</li>
+      <li>Allow <em>Install unknown apps</em> if asked</li>
+      <li>Tap <strong>Install</strong> → Open</li>
+    </ol>
+    <p style="font-size:.8rem;opacity:.7;margin-top:16px;">
+      Debug-signed personal build. Safe for sideloading on your own devices.
+    </p>
+  </div>
+  <script>
+    (async function () {
+      const status = document.getElementById('status');
+      const primary = document.getElementById('primary-download');
+      const releases = document.getElementById('releases-link');
+      // Default fallbacks — updated by API when available
+      const repo = 'jojokundesu/task-soloist';
+      releases.href = 'https://github.com/' + repo + '/releases';
+      primary.href = 'https://github.com/' + repo + '/releases/latest/download/TaskSoloist.apk';
+
+      try {
+        const res = await fetch('https://api.github.com/repos/' + repo + '/releases?per_page=5');
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const list = await res.json();
+        const withApk = list.find(r => (r.assets || []).some(a => /\.apk$/i.test(a.name)));
+        if (withApk) {
+          const asset = withApk.assets.find(a => a.name === 'TaskSoloist.apk')
+            || withApk.assets.find(a => /\.apk$/i.test(a.name));
+          primary.href = asset.browser_download_url;
+          releases.href = withApk.html_url;
+          status.textContent = 'Latest: ' + withApk.tag_name + ' · ' + (asset.size/1024/1024).toFixed(1) + ' MB';
+        } else {
+          status.textContent = 'APK is building — check Releases in a few minutes, or use the link above once published.';
+        }
+      } catch (e) {
+        status.textContent = 'Using GitHub latest-download link. If 404, the APK is still building.';
+      }
+    })();
+  </script>
+</body>
+</html>

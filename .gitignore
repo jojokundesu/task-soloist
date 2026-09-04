@@ -11,6 +11,25 @@ node_modules
 dist
 dist-ssr
 *.local
+data/*.db
+data/*.db-*
+*.db
+*.db-shm
+*.db-wal
+
+# Android / Capacitor
+android/.gradle
+android/app/build
+android/build
+android/local.properties
+android/captures
+*.apk
+*.aab
+*.keystore
+*.jks
+release/
+.idea/
+.capacitor/
 
 # Editor directories and files
 .vscode/*

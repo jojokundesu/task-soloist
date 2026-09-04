@@ -1,10 +1,9 @@
 
 import { Meditation } from "@/types";
-import { v4 as uuidv4 } from "uuid";
 
 export const meditations: Meditation[] = [
   {
-    id: uuidv4(),
+    id: "med-flower",
     name: "Flower Meditation",
     description: "A powerful technique where you focus on a flower until there is no separation between you and the object of focus.",
     teacher: "Osho",
@@ -15,7 +14,7 @@ export const meditations: Meditation[] = [
     duration: [5, 10, 15, 20, 30],
   },
   {
-    id: uuidv4(),
+    id: "med-mother",
     name: "Universal Mother Meditation",
     description: "A compassion-based meditation where you consider yourself as a mother to every being in existence.",
     teacher: "Sadhguru",
@@ -26,7 +25,7 @@ export const meditations: Meditation[] = [
     duration: [5, 10, 15, 20, 30],
   },
   {
-    id: uuidv4(),
+    id: "med-isha",
     name: "Isha Kriya",
     description: "A simple yet powerful meditation focusing on breath and a specific thought process.",
     teacher: "Sadhguru",
@@ -37,7 +36,7 @@ export const meditations: Meditation[] = [
     duration: [5, 10, 15, 20, 30],
   },
   {
-    id: uuidv4(),
+    id: "med-dynamic",
     name: "Dynamic Meditation",
     description: "An active meditation technique designed to release repressed emotions and energy through physical movement.",
     teacher: "Osho",
@@ -48,7 +47,7 @@ export const meditations: Meditation[] = [
     duration: [60],
   },
   {
-    id: uuidv4(),
+    id: "med-nadi",
     name: "Nadi Shodhan Pranayama",
     description: "Alternate nostril breathing technique that balances the subtle energy channels in the body.",
     teacher: "Ancient Yogic Practice",
@@ -59,7 +58,7 @@ export const meditations: Meditation[] = [
     duration: [5, 10, 15, 20],
   },
   {
-    id: uuidv4(),
+    id: "med-shambhavi",
     name: "Shambhavi Mahamudra",
     description: "A powerful kriya yoga technique that works with breath control and specific eye positioning.",
     teacher: "Sadhguru",
@@ -71,8 +70,6 @@ export const meditations: Meditation[] = [
     isSecret: true
   }
 ];
-
-export const innerEngineeringLink = "https://www.innerengineering.com/";
 
 export const getPublicMeditations = () => {
   return meditations.filter(m => !m.isSecret);

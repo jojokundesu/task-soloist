@@ -1,40 +1,45 @@
-
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.lovable.tasksoloist',
+  appId: 'app.tasksoloist.hunter',
   appName: 'Task Soloist',
   webDir: 'dist',
-  bundledWebRuntime: true, // Package the web app with the native app
+  bundledWebRuntime: false,
+  server: {
+    // Fully offline — load from bundled assets, never remote
+    androidScheme: 'https',
+    cleartext: false,
+  },
   plugins: {
     SplashScreen: {
-      launchShowDuration: 2000,
-      backgroundColor: "#121318",
+      launchShowDuration: 1800,
+      backgroundColor: '#121318',
       showSpinner: true,
-      androidSpinnerStyle: "large",
-      spinnerColor: "#8B5CF6",
+      androidSpinnerStyle: 'large',
+      spinnerColor: '#8B5CF6',
       splashFullScreen: true,
-      splashImmersive: true
+      splashImmersive: true,
     },
-    // Explicitly declare which permissions we need (minimal)
-    Permissions: {
-      permissions: [] // No specific permissions needed for this app
-    }
+    StatusBar: {
+      style: 'DARK',
+      backgroundColor: '#121318',
+    },
   },
-  // This is required for Capacitor to work without a network connection
-  loggingBehavior: 'none',
+  loggingBehavior: 'production',
   android: {
+    allowMixedContent: false,
+    backgroundColor: '#121318',
     buildOptions: {
       keystorePath: undefined,
       keystorePassword: undefined,
       keystoreAlias: undefined,
       keystoreAliasPassword: undefined,
-      releaseType: 'none'
-    }
+      releaseType: 'APK',
+    },
   },
   ios: {
-    contentInset: 'always'
-  }
+    contentInset: 'always',
+  },
 };
 
 export default config;

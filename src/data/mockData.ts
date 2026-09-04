@@ -105,10 +105,12 @@ export const achievements: Achievement[] = [
     id: "ach1",
     name: "First Steps",
     description: "Complete your first task",
-    completed: true,
+    completed: false,
     icon: "footprints",
     reward: 10,
     unlockCondition: "Complete 1 task",
+    progress: 0,
+    target: 1,
   },
   {
     id: "ach2",
@@ -118,6 +120,8 @@ export const achievements: Achievement[] = [
     icon: "sun",
     reward: 15,
     unlockCondition: "Complete a task before 8 AM",
+    progress: 0,
+    target: 1,
   },
   {
     id: "ach3",
@@ -127,15 +131,19 @@ export const achievements: Achievement[] = [
     icon: "flame",
     reward: 50,
     unlockCondition: "7-day streak",
+    progress: 0,
+    target: 7,
   },
   {
     id: "ach4",
     name: "Knowledge Seeker",
-    description: "Read for 30 days",
+    description: "Complete 30 learning tasks",
     completed: false,
     icon: "book",
     reward: 75,
-    unlockCondition: "Complete reading tasks for 30 days",
+    unlockCondition: "Complete 30 learning tasks",
+    progress: 0,
+    target: 30,
   },
   {
     id: "ach5",
@@ -145,9 +153,10 @@ export const achievements: Achievement[] = [
     icon: "dumbbell",
     reward: 100,
     unlockCondition: "Complete 20 workout tasks",
+    progress: 0,
+    target: 20,
   },
 ];
-
 // Sample tasks
 export const tasks: Task[] = [
   {

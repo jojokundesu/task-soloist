@@ -1,0 +1,23 @@
+{
+  "name": "Task Soloist",
+  "short_name": "Soloist",
+  "description": "Fully offline Solo Leveling inspired productivity RPG",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#121318",
+  "theme_color": "#8B5CF6",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/placeholder.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

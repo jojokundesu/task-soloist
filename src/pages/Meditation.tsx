@@ -1,25 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
 import NavBar from '@/components/navigation/nav-bar';
-import { ArrowLeft, Info, Play, X, Clock, Brain, Check, ArrowRight } from 'lucide-react';
+import { ArrowLeft, Info, Play, X, Clock, Brain, Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { getPublicMeditations, getSecretMeditation } from '@/data/meditationData';
-import { innerEngineeringLink } from '@/data/meditationData';
 import GlassCard from '@/components/ui/glass-card';
 import { Meditation as MeditationType } from '@/types';
-import { updateMeditationStreak, checkSecretMeditationUnlocked, getMeditationStreak } from '@/services/storageService';
-import { 
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-  DrawerClose,
-  DrawerFooter
-} from "@/components/ui/drawer";
 import { 
   Dialog,
   DialogContent,
@@ -31,6 +19,7 @@ import {
   DialogClose
 } from "@/components/ui/dialog";
 import { useToast } from '@/hooks/use-toast';
+import { useApp } from '@/context/AppContext';
 
 const MeditationItem = ({ 
   meditation, 
@@ -203,9 +192,12 @@ const MeditationPage = () => {
   const [isTimerActive, setIsTimerActive] = useState(false);
   const [showMeditationComplete, setShowMeditationComplete] = useState(false);
   const { toast } = useToast();
+  const { state, completeMeditation } = useApp();
   const publicMeditations = getPublicMeditations();
   const secretMeditation = getSecretMeditation();
-  const isSecretUnlocked = checkSecretMeditationUnlocked();
+  const medStreak = state?.user?.meditation?.streak || 0;
+  const isSecretUnlocked = !!state?.user?.meditation?.unlockedSecretMeditation;
+  const recentSessions = state?.meditations || [];
   
   const handleMeditationSelect = (meditation: MeditationType) => {
     setSelectedMeditation(meditation);
@@ -217,18 +209,16 @@ const MeditationPage = () => {
     setIsTimerActive(true);
   };
   
-  const handleTimerComplete = () => {
+  const handleTimerComplete = async () => {
     setIsTimerActive(false);
-    updateMeditationStreak();
-    setShowMeditationComplete(true);
-    
-    // Play gentle sound to indicate completion
-    try {
-      const audio = new Audio('/meditation-complete.mp3');
-      audio.play();
-    } catch(e) {
-      console.error('Could not play completion sound');
+    if (selectedMeditation && selectedDuration) {
+      await completeMeditation({
+        meditationId: selectedMeditation.id,
+        meditationName: selectedMeditation.name,
+        durationMinutes: selectedDuration,
+      });
     }
+    setShowMeditationComplete(true);
   };
   
   const handleCompletionClose = () => {
@@ -345,19 +335,11 @@ const MeditationPage = () => {
                 {selectedMeditation.isSecret && (
                   <div className="mt-6 p-4 border border-solo-highlight/30 bg-solo-highlight/10 rounded-lg">
                     <h3 className="font-medium text-solo-highlight mb-2">Important Note</h3>
-                    <p className="text-sm mb-3">
-                      Shambhavi Mahamudra is a sacred kriya that should only be learned through proper initiation. 
-                      For the authentic experience and proper guidance, consider Sadhguru's Inner Engineering program.
+                    <p className="text-sm">
+                      Shambhavi Mahamudra is a sacred kriya that should only be learned through proper initiation.
+                      This entry is informational within the offline System — practice only what you have been
+                      properly taught.
                     </p>
-                    <a 
-                      href={innerEngineeringLink} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-solo-highlight text-sm flex items-center"
-                    >
-                      Learn more about Inner Engineering
-                      <ArrowRight className="h-4 w-4 ml-1" />
-                    </a>
                   </div>
                 )}
               </div>
@@ -434,7 +416,7 @@ const MeditationPage = () => {
             <TabsContent value="progress" className="animate-fade-in">
               <div className="bg-black/20 rounded-lg p-6 text-center mb-6">
                 <div className="text-3xl font-bold text-solo-accent mb-2">
-                  {getMeditationStreak()}
+                  {medStreak}
                 </div>
                 <div className="text-sm text-solo-secondary mb-4">
                   Day Streak
@@ -442,15 +424,31 @@ const MeditationPage = () => {
                 <div className="h-2 bg-black/30 rounded-full overflow-hidden mb-2">
                   <div 
                     className="h-full bg-gradient-to-r from-solo-accent to-solo-highlight rounded-full"
-                    style={{ width: `${Math.min((getMeditationStreak() / 7) * 100, 100)}%` }}
+                    style={{ width: `${Math.min((medStreak / 7) * 100, 100)}%` }}
                   />
                 </div>
                 <div className="text-xs text-solo-secondary">
                   {isSecretUnlocked 
                     ? "Secret technique unlocked! 🎉" 
-                    : `${7 - getMeditationStreak()} more days until secret technique`}
+                    : `${Math.max(0, 7 - medStreak)} more days until secret technique`}
                 </div>
               </div>
+
+              {recentSessions.length > 0 && (
+                <div className="bg-black/20 rounded-lg p-4 mb-6">
+                  <h3 className="font-medium mb-3">Recent Sessions</h3>
+                  <div className="space-y-2 max-h-40 overflow-y-auto">
+                    {recentSessions.slice(0, 10).map((s) => (
+                      <div key={s.id} className="flex justify-between text-sm border-b border-white/5 pb-2">
+                        <span className="truncate">{s.meditationName}</span>
+                        <span className="text-solo-secondary whitespace-nowrap ml-2">
+                          {s.durationMinutes}m · {new Date(s.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
               
               <div className="bg-black/20 rounded-lg p-6 mb-6">
                 <h3 className="font-medium mb-4">Meditation Benefits</h3>
@@ -534,10 +532,10 @@ const MeditationPage = () => {
               You've gained mental clarity and focus.
             </p>
             <p className="text-sm text-solo-secondary text-center">
-              Your meditation streak is now: <span className="font-bold text-solo-accent">{getMeditationStreak()} days</span>
+              Your meditation streak is now: <span className="font-bold text-solo-accent">{medStreak} days</span>
             </p>
             
-            {getMeditationStreak() === 7 && (
+            {isSecretUnlocked && (
               <div className="mt-4 p-3 bg-solo-highlight/10 border border-solo-highlight/30 rounded-lg text-center">
                 <p className="text-sm font-medium text-solo-highlight">
                   🎉 You've unlocked the secret meditation technique!

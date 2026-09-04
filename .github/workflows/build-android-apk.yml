@@ -1,0 +1,98 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [main, 'arena/**']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install dependencies
+        run: npm ci || npm install
+
+      - name: Build web assets
+        run: npm run build
+
+      - name: Add Capacitor Android platform
+        run: |
+          npx cap add android || true
+          npx cap sync android
+
+      - name: Make gradlew executable
+        run: chmod +x android/gradlew
+
+      - name: Build debug APK
+        working-directory: android
+        run: |
+          ./gradlew assembleDebug --no-daemon --stacktrace
+        env:
+          ANDROID_HOME: ${{ env.ANDROID_HOME }}
+
+      - name: Locate APK
+        id: apk
+        run: |
+          APK=$(find android -name "*.apk" | head -1)
+          echo "path=$APK" >> $GITHUB_OUTPUT
+          ls -lh "$APK"
+          mkdir -p release
+          cp "$APK" release/TaskSoloist.apk
+          cp "$APK" release/task-soloist-debug.apk
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TaskSoloist-APK
+          path: release/*.apk
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Create GitHub Release
+        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/arena/')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk-${{ github.run_number }}
+          name: Task Soloist APK #${{ github.run_number }}
+          body: |
+            ## Task Soloist — Android APK
+
+            Fully offline Solo Leveling–inspired productivity RPG.
+
+            ### Install
+            1. Download `TaskSoloist.apk`
+            2. On your Android phone: allow **Install from unknown sources** for your browser/Files app
+            3. Open the APK and tap **Install**
+
+            ### Notes
+            - No internet required after install
+            - All data stays on your device
+            - Debug-signed build (fine for personal use)
+          files: |
+            release/TaskSoloist.apk
+            release/task-soloist-debug.apk
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

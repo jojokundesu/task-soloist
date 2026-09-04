@@ -5,10 +5,19 @@ export interface Task {
   description?: string;
   completed: boolean;
   date: string;
+  dueDate?: string;
   recurring?: boolean;
+  recurringType?: string;
   xpReward: number;
+  currencyReward?: number;
   category?: string;
+  skillId?: string;
+  priority?: string;
+  difficulty?: string;
+  notes?: string;
+  completedAt?: string;
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface Skill {
@@ -18,6 +27,8 @@ export interface Skill {
   experience: number;
   nextLevelExp: number;
   icon?: string;
+  categoryId?: string;
+  description?: string;
 }
 
 export interface Achievement {
@@ -28,6 +39,10 @@ export interface Achievement {
   icon: string;
   reward: number;
   unlockCondition: string;
+  category?: string;
+  progress?: number;
+  target?: number;
+  unlockedAt?: string;
 }
 
 export interface User {
@@ -44,6 +59,21 @@ export interface User {
     charisma: number;
     endurance: number;
     focus: number;
+  };
+  profile?: {
+    age?: number;
+    height?: number;
+    weight?: number;
+    bodyFatPercentage?: number;
+    title?: string;
+    avatar?: string;
+  };
+  totals?: {
+    totalXpEarned: number;
+    tasksCompleted: number;
+    currentStreak: number;
+    longestStreak: number;
+    lastActiveDate?: string;
   };
   skills: Skill[];
   achievements: Achievement[];
@@ -76,6 +106,7 @@ export interface Reward {
   cost: number;
   claimed: boolean;
   icon: string;
+  timesClaimed?: number;
 }
 
 export interface Meditation {
@@ -97,4 +128,53 @@ export interface Message {
   content: string;
   timestamp: string;
   isError?: boolean;
+}
+
+export interface Habit {
+  id: string;
+  name: string;
+  description?: string;
+  icon: string;
+  color: string;
+  xpReward: number;
+  targetDays: number;
+  currentStreak: number;
+  longestStreak: number;
+  totalCompletions: number;
+  lastCompleted?: string;
+  completedToday: boolean;
+  recentLogs: string[];
+}
+
+export interface Quest {
+  id: string;
+  title: string;
+  description?: string;
+  type: string;
+  status: string;
+  progress: number;
+  target: number;
+  xpReward: number;
+  currencyReward: number;
+}
+
+export interface JournalEntry {
+  id: string;
+  title?: string;
+  content: string;
+  mood: number;
+  tags: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface InventoryItem {
+  id: string;
+  name: string;
+  description?: string;
+  type: string;
+  rarity: string;
+  icon: string;
+  quantity: number;
+  effect: Record<string, number>;
 }
