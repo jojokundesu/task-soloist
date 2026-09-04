@@ -1,67 +1,66 @@
-# Task Soloist — Installation Guide
+# Task Soloist — Android Installation
 
-Task Soloist is a **fully offline full-stack app**. After install, it needs no internet.
+## Fastest path: download the APK
 
-## Web (desktop / laptop)
+### Direct download link
+**https://github.com/jojokundesu/task-soloist/releases/latest/download/TaskSoloist.apk**
+
+### This release
+**https://github.com/jojokundesu/task-soloist/releases/download/apk-1/TaskSoloist.apk**
+
+### Releases page
+**https://github.com/jojokundesu/task-soloist/releases**
+
+---
+
+## Install on your Android phone
+
+1. Open the **Direct download link** above **on your phone** (Chrome / Firefox / Samsung Internet).
+2. When the file finishes downloading, open it from the notification shade or **Files / Downloads**.
+3. If Android blocks it:
+   - Tap **Settings** on the warning
+   - Enable **Allow from this source** (for your browser or Files app)
+   - Go back and tap the APK again
+4. Tap **Install** → wait a few seconds → tap **Open**.
 
 ### Requirements
-- Node.js 18+ (LTS recommended)
-- npm 9+
+- Android 6.0 (API 23) or newer  
+- ~10 MB free storage  
+- No Google account, no Play Store, no internet after install  
 
-### Run in development
+---
 
-```bash
-npm install
-npm run dev
-```
+## What you get
 
-This starts:
-- **API + SQLite** on port `3001`
-- **Vite frontend** on port `8080` (proxies `/api` locally)
+Task Soloist is an **Android-first offline app**:
+- Quests, habits, meditation, journal, inventory, rewards  
+- XP, ranks (E → Shadow Monarch), achievements  
+- Offline Beru chat companion  
+- All data stored on your phone  
 
-Open the Vite URL in your browser.
+---
 
-### Production (single server)
+## Optional: build the APK yourself
 
 ```bash
 npm install
 npm run build
-npm start
+npx cap add android    # first time
+npx cap sync android
+npx cap open android   # Android Studio → Build → Build APK(s)
 ```
 
-Visit `http://localhost:3001` — Express serves both the API and the built UI.
+Or push to GitHub — the Action `.github/workflows/build-android-apk.yml` builds and uploads `TaskSoloist.apk` to Releases automatically.
 
-## Android (Capacitor)
-
-1. `npm install && npm run build`
-2. `npx cap add android` (first time)
-3. `npx cap sync`
-4. `npx cap open android` → Build APK in Android Studio
-
-The app stores data on-device. Pair with the local Node server for full API features when developing; packaged builds can embed or point at a local backend.
-
-## Data location
-
-| Item | Path |
-|------|------|
-| SQLite DB | `data/task-soloist.db` |
-| JSON backups | Exported from **Profile → Local Backup** |
-
-## Privacy
-
-- No cloud accounts
-- No Google / Supabase / OpenAI calls
-- No external fonts or analytics CDNs
-- Beru chat runs as a local conversation engine
-- Optional JSON export stays on your machine
+---
 
 ## Troubleshooting
 
-| Issue | Fix |
-|-------|-----|
-| “Local server unreachable” | Run `npm run dev` (both processes) |
-| Port in use | Set `PORT=3002` for API; update Vite proxy if needed |
-| Corrupt data | Profile → Reset, or delete `data/*.db*` |
-| blank screen offline | Ensure service worker registered after first online load of assets |
+| Problem | Fix |
+|---------|-----|
+| “Blocked by Play Protect” | Tap **More details** → **Install anyway** (debug sideload is normal for personal APKs) |
+| “App not installed” | Uninstall any older Task Soloist first, or free storage |
+| Download is HTML not APK | Use the **direct** `.apk` link, not the releases homepage alone |
+| Want a fresh install | Clear app storage or reinstall the APK |
 
 Enjoy leveling up, hunter.

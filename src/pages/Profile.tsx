@@ -169,6 +169,33 @@ const Profile = () => {
           </div>
         </GlassCard>
 
+        {/* Android APK download */}
+        <GlassCard className="mb-6 animate-fade-in border-solo-accent/30">
+          <h2 className="text-lg font-semibold mb-2 bg-gradient-to-r from-solo-accent to-solo-highlight bg-clip-text text-transparent">
+            Android APK
+          </h2>
+          <p className="text-sm text-solo-secondary mb-3">
+            Install Task Soloist on your phone — fully offline, no account needed.
+          </p>
+          <a
+            href="https://github.com/jojokundesu/task-soloist/releases/latest/download/TaskSoloist.apk"
+            className="flex items-center justify-center w-full py-3 rounded-lg bg-gradient-to-r from-solo-accent to-solo-highlight text-white font-semibold text-sm"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Download TaskSoloist.apk
+          </a>
+          <a
+            href="https://github.com/jojokundesu/task-soloist/releases"
+            className="block text-center text-xs text-solo-accent mt-2 hover:underline"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            All releases on GitHub
+          </a>
+        </GlassCard>
+
         {/* Local backup — fully offline */}
         <GlassCard className="mb-6 animate-fade-in">
           <div className="flex items-center justify-between mb-3">
